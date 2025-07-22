@@ -65,6 +65,10 @@ export class MainContainer {
     this.showUploadModal = false;
   }
 
+  closePromptModal() {
+    this.showPromptModal = false;
+  }
+
 // static data -------------------
   jobDescriptionsFileList: JobDescriptionFile[] = [
     ...Array.from({ length: 100 }, (_, i) => ({

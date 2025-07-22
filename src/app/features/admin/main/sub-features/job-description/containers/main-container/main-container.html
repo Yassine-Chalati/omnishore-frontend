@@ -16,7 +16,7 @@
       <ng-container *ngIf="showPromptModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-prompt-component></app-prompt-component>
+          <app-prompt-component (closed)="closePromptModal()"></app-prompt-component>
         </div>
       </ng-container>
     </div>
