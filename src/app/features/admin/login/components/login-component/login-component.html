@@ -1,0 +1,63 @@
+<div
+  class="d-flex flex-column align-items-center justify-content-center min-vh-100 p-4"
+  [@fadeIn]
+>
+  <img
+    src="logo.png"
+    alt="Omnishore Logo"
+    class="mb-4"
+    style="width: 180px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"
+  />
+
+  <div
+    class="w-100 card p-4 shadow"
+    style="max-width: 400px; border-radius: 1rem; text-align: center; background: #fff;"
+    [class.loading]="loading"
+  >
+    <h2 class="mb-3 fw-semibold" style="font-family: 'Poppins', sans-serif; color: #30245c;">
+      Bienvenue dans votre espace RH
+    </h2>
+
+    <p class="mb-4" style="font-size: 0.9rem; color: #30245c;">
+      Connectez-vous à votre espace RH
+    </p>
+
+    <form (submit)="login()" novalidate>
+      <input
+        type="text"
+        placeholder="Nom d'utilisateur"
+        [(ngModel)]="username"
+        name="username"
+        required
+        class="form-control mb-3"
+        style="border-color: #30245c; color: #30245c;"
+      />
+      <input
+        type="password"
+        placeholder="Mot de passe"
+        [(ngModel)]="password"
+        name="password"
+        required
+        class="form-control mb-3"
+        style="border-color: #30245c; color: #30245c;"
+      />
+
+      <button
+        type="submit"
+        class="btn w-100 fw-bold"
+        [disabled]="loading"
+        style="background: #30245c; color: #fff; border: none;"
+      >
+        <span *ngIf="!loading">Se connecter</span>
+        <span
+          *ngIf="loading"
+          class="spinner-border spinner-border-sm text-light"
+          role="status"
+          aria-hidden="true"
+        ></span>
+      </button>
+    </form>
+
+    <p *ngIf="error" class="text-danger mt-3 text-center">{{ error }}</p>
+  </div>
+</div>

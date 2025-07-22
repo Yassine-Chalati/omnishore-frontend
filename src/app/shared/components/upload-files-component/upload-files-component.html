@@ -1,0 +1,72 @@
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1;"></div>
+  <div class="modal-content p-4 rounded-4 shadow-lg border-0" style="max-width: 480px; margin: auto; z-index:2; background: #fff; color: #2d2346; box-shadow: 0 8px 32px 0 rgba(44,36,92,0.12);" [@modalAnim]="modalState">
+    <div
+      class="toast-stack"
+      [ngClass]="{
+        'toast-stack-bottom-left': toastPosition === 'bottom-left',
+        'toast-stack-bottom-right': toastPosition === 'bottom-right',
+        'toast-stack-top-left': toastPosition === 'top-left',
+        'toast-stack-top-right': toastPosition === 'top-right'
+      }"
+      style="position: fixed; z-index: 4000; pointer-events: none; width: 360px; max-width: 96vw;"
+    >
+      <ng-container *ngFor="let toast of toasts">
+        <app-toast-component [color]="toast.color" [message]="toast.message" style="pointer-events: auto;"></app-toast-component>
+      </ng-container>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-center fw-bold m-0 w-100" style="color: #30245c;">Télécharger</h3>
+      <button class="btn btn-sm position-absolute top-0 end-0 close-zoom-btn" style="font-size:1.4rem; color:#30245c; background:transparent; border:none; box-shadow:none; transition: color 0.2s, transform 0.2s;" (click)="closeModal()" title="Fermer">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <!-- Drag & Drop Area -->
+    <div
+      class="border border-2 rounded-3 mb-4 p-4 text-center position-relative upload-drop-area animate__animated animate__pulse animate__infinite"
+      style="border-style: dashed; min-height: 140px; background: #fafaff; cursor: pointer; transition: box-shadow 0.2s; border-color: #bdb6d6;"
+      [ngClass]="{'bg-light shadow-lg': dragOver}"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (click)="fileInput.click()"
+    >
+      <div class="mb-2">
+        <i class="bi bi-cloud-arrow-up display-4" style="color: #30245c;"></i>
+      </div>
+      <div class="fw-semibold mb-1" style="font-size:1.1rem;">Drag &amp; drop fichiers ou <span class="fw-bold" style="color: #30245c; text-decoration: underline; cursor:pointer;">Naviguer</span></div>
+      <div class="text-muted small">Formats supportés: JPEG, PNG, PDF</div>
+      <input #fileInput type="file" [attr.multiple]="allowMultiple ? '' : null" (change)="onFileSelected($event)" style="display:none;" />
+    </div>
+    <!-- Upload Progress & Input -->
+    <div class="mb-3" *ngIf="uploading">
+      <label class="form-label fw-semibold mb-1">Téléchargement</label>
+      <div class="input-group input-group-sm mb-1">
+        <input type="text" class="form-control" [value]="files.length ? files[0].name : ''" readonly>
+        <button class="btn btn-outline-secondary" type="button" (click)="removeFile(0)" *ngIf="files.length"><i class="bi bi-x"></i></button>
+      </div>
+      <div class="progress" style="height: 4px;">
+        <div class="progress-bar" role="progressbar" [style.width.%]="progress" [style.background]="'#30245c'" [attr.aria-valuenow]="progress" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
+    <!-- Uploaded Files List & Delete All -->
+    <div class="mb-4" style="max-height: 180px; overflow-y: auto;" @fileListAnim>
+      <div class="d-flex justify-content-end mb-2" *ngIf="files.length > 0">
+        <button class="btn btn-outline-danger btn-sm" (click)="deleteAllFiles()"><i class="bi bi-trash"></i> Supprimer tout</button>
+      </div>
+      <label class="form-label fw-semibold mb-1">Téléchargé</label>
+      <div class="d-flex flex-column gap-2">
+        <div *ngFor="let file of files; let i = index" class="input-group input-group-sm animate__animated animate__fadeInUp">
+          <input type="text" class="form-control" [value]="file.name" readonly>
+          <button class="btn btn-outline-primary" type="button" (click)="downloadFile(file)"><i class="bi bi-download"></i></button>
+          <button class="btn btn-outline-danger" type="button" (click)="removeFile(i)"><i class="bi bi-trash"></i></button>
+        </div>
+        <div *ngIf="files.length === 0" class="text-muted small text-center">Aucun fichier sélectionné.</div>
+      </div>
+    </div>
+    <!-- Upload Button -->
+    <button class="btn w-100 py-2 fw-bold animate__animated animate__pulse animate__infinite" style="background: #30245c; color: #fff; font-size:1.1rem; letter-spacing:0.5px;" [disabled]="files.length === 0 || uploading" (click)="sendFiles()">
+      TÉLÉCHARGER DES FICHIERS
+    </button>
+  </div>
+</div>

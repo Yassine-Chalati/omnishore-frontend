@@ -1,1 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+body[data-bs-theme="dark"] {
+  --bs-primary: #30245c;
+  --bs-body-bg: #30245c;
+  --bs-body-color: #f8f9fa; /* light text for contrast */
+}

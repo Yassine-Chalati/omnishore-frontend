@@ -1,0 +1,10 @@
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1;"></div>
+  <div class="prompt-modal position-relative p-3 p-md-4 rounded shadow-lg bg-white w-100" style="z-index:2; max-width:700px; min-width:0; width:100%; margin: 0 1rem; border: 2px solid #30245c;">
+    <h5 class="mb-3 fs-6 fs-md-5" style="color:#30245c;">Enter your text</h5>
+    <textarea class="form-control mb-3 w-100" rows="6" style="resize:none; min-height:120px;" [(ngModel)]="promptText" placeholder="Type your message here..."></textarea>
+    <div class="d-flex justify-content-end">
+      <app-primary-button-component label="" icon="bi bi-send" (click)="sendPrompt()"> </app-primary-button-component>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div
+  class="toast-container"
+  [@toastAnim]
+  [ngClass]="{
+    'toast-success': color === 'success',
+    'toast-error': color === 'error',
+    'toast-warning': color === 'warning'
+  }"
+  [style.background]="color !== 'success' && color !== 'error' && color !== 'warning' ? color : null"
+  [style.boxShadow]="'0 8px 32px 0 rgba(44,36,92,0.18), 0 2px 8px 0 rgba(44,36,92,0.10)'"
+  [style.position]="'relative'"
+>
+  <span class="toast-message">{{ message }}</span>
+  <div class="toast-progress-border" [style.background]="getProgressBarColor()">
+    <div class="toast-progress-bar" [style.width.%]="progress"></div>
+  </div>
+</div>

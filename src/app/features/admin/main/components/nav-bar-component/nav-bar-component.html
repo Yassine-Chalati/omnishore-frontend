@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg navbar-dark py-2" style="background-color: #30245c; font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;" @fadeIn>
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center me-2" href="#" (click)="goTo(logoUrl)">
+      <span style="font-weight:700; font-size:1.35rem; letter-spacing:0.5px;">
+        <ng-container *ngFor="let char of logoChars; let i = index">
+          <span [@logoCharAnim]="logoCharStates[i]"
+                (mouseenter)="setLogoCharState(i, 'hover')"
+                (mouseleave)="setLogoCharState(i, 'normal')"
+                style="display:inline-block;">{{ char }}</span>
+        </ng-container>
+      </span>
+    </a>
+    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse flex-lg-grow-0 custom-mobile-menu" id="navbarNavAltMarkup">
+      <ul class="navbar-nav ms-auto w-100 justify-content-end gap-2 gap-lg-3 flex-column flex-lg-row align-items-stretch align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-1 px-3 py-2"
+             [ngClass]="{'active-tab': selectedTab === 'cv'}"
+             style="cursor:pointer; font-size:1.08rem; font-weight:500; border-radius: 50px;"
+             [@clickAnim]="clickStates['cv']"
+             (click)="goTo(cvUrl)">
+            <i class="bi bi-file-earmark-person"></i>
+            Les CVs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-1 px-3 py-2"
+             [ngClass]="{'active-tab': selectedTab === 'job-description'}"
+             style="cursor:pointer; font-size:1.08rem; font-weight:500; border-radius: 50px;"
+             [@clickAnim]="clickStates['job-description']"
+             (click)="goTo(jobDescriptionUrl)">
+            <i class="bi bi-briefcase"></i>
+            Fiche de poste
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold d-flex align-items-center gap-1 logout-link px-3 py-2"
+             style="cursor:pointer; font-size:1.08rem; font-weight:600; border-radius: 50px;"
+             [@clickAnim]="clickStates['logout']"
+             (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+            Se déconnecter
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

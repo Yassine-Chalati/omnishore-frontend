@@ -1,0 +1,40 @@
+/* Toast stack positions for premium look */
+.toast-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+.toast-stack-bottom-left {
+  left: 0;
+  bottom: 0;
+  align-items: flex-start;
+  margin: 3.5rem 0 3.5rem 2.5rem;
+  position: fixed;
+}
+.toast-stack-bottom-right {
+  right: 0;
+  bottom: 0;
+  align-items: flex-end;
+  margin: 3.5rem 2.5rem 3.5rem 0;
+  position: fixed;
+}
+.toast-stack-top-left {
+  left: 0;
+  top: 0;
+  align-items: flex-start;
+  margin: 2.5rem 0 0 2.5rem;
+  position: fixed;
+}
+.toast-stack-top-right {
+  right: 0;
+  top: 0;
+  align-items: flex-end;
+  margin: 2.5rem 2.5rem 0 0;
+  position: fixed;
+}
+/* Hover effect for close (X) button */
+.close-zoom-btn:hover {
+  color: #e75480 !important;
+  transform: scale(1.25);
+}

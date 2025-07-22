@@ -1,0 +1,4 @@
+/* Style textarea border always #30245c */
+.prompt-modal textarea {
+  border: 2px solid #30245c;
+}

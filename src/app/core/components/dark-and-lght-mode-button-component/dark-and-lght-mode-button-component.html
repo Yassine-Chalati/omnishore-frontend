@@ -1,0 +1,3 @@
+<button class="dark-light-toggle-btn" (click)="toggleDarkMode()" [@floatIn] [@clickAnim]="clickState" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+  <i class="bi" [ngClass]="isDarkMode ? 'bi-sun-fill' : 'bi-moon-fill'"></i>
+</button>
