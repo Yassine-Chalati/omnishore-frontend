@@ -5,12 +5,14 @@ import { trigger, state, style, animate, transition, keyframes } from '@angular/
 import { CvTableComponent } from '../../components/cv-table-component/cv-table-component';
 import { UploadFilesComponent } from '../../../../../../../shared/components/upload-files-component/upload-files-component';
 import { PrimaryButtonComponent } from '../../../../../../../shared/components/primary-button-component/primary-button-component';
+import { StructuredCvFormComponent } from '../../../../../../../shared/components/structured-cv-from-component/structured-cv-form-component';
 import { CvFile } from '../../../../../../../core/models/cv-file.model';
+import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
 
 
 @Component({
   selector: 'app-main-container',
-  imports: [PrimaryButtonComponent, CvTableComponent, UploadFilesComponent, ToastComponent, NgIf],
+  imports: [PrimaryButtonComponent, CvTableComponent, UploadFilesComponent, ToastComponent, NgIf, StructuredCvFormComponent, FilePopUpComponent],
   templateUrl: './main-container.html',
   styleUrl: './main-container.css',
   standalone: true,
@@ -51,6 +53,8 @@ import { CvFile } from '../../../../../../../core/models/cv-file.model';
 })
 export class MainContainer {
   showUploadModal = false;
+  showStructuredCvFormModal = false;
+  showFilePopUpModal = false;
 
   openUploadModal() {
     this.showUploadModal = true;
@@ -60,7 +64,30 @@ export class MainContainer {
     this.showUploadModal = false;
   }
 
-    // static data -------------------
+  openStructuredCvFormModal() {
+    this.showStructuredCvFormModal = true;
+  }
+
+  closeStructuredCvFormModal() {
+    this.showStructuredCvFormModal = false;
+    setTimeout(() => {
+        const modalBackdrop = document.querySelector('.modal-backdrop');
+        if (modalBackdrop) {
+            modalBackdrop.remove();
+        }
+        document.body.classList.remove('modal-open');
+    }, 200); // Match leave animation duration
+  }
+
+  openFilePopUpModal() {
+    this.showFilePopUpModal = true;
+  }
+
+  closeFilePopUpModal() {
+    this.showFilePopUpModal = false;
+  }
+
+// static data -------------------
   cvList: CvFile[] = [
     ...Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,

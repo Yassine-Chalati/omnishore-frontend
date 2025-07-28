@@ -1,0 +1,24 @@
+<div class="position-fixed top-0 end-0 p-3" style="z-index:2000; min-width:320px; max-width:400px;">
+  <!-- Example usage, replace with state-driven toast as needed -->
+  <app-toast-component *ngIf="false" color="success" message="Ceci est un toast global!"></app-toast-component>
+</div>
+<div class="main-container d-flex flex-column flex-grow-1 mt-5" @fadeIn>
+  <div class="table-responsive px-2 px-md-4 pt-3 pt-md-4 pb-2 mx-3 mx-md-5">
+    <div class="d-flex flex-column flex-sm-row justify-content-sm-end align-items-stretch align-items-sm-center gap-2 mb-2 mx-3 mx-md-5" style="min-height:48px;">
+      <app-primary-button-component label="Afficher fiche de poste" (click)="openFilePopUpModal()"></app-primary-button-component>
+      <ng-container *ngIf="showStructuredCvFormModal">
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+          <app-structured-cv-form-component (closed)="closeStructuredCvFormModal()"></app-structured-cv-form-component>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="showFilePopUpModal">
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+          <app-file-pop-up-component></app-file-pop-up-component>
+        </div>
+      </ng-container>
+    </div>
+    <app-matching-table-component (clickedStructuredCvForm)="openStructuredCvFormModal()" (clickedFilePopUp)="openFilePopUpModal()" [matchingList]="matchingList"></app-matching-table-component>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<button type="button"
+  class="step-card w-100 d-flex align-items-center gap-3 px-4 py-3 border-0 rounded-3 shadow-sm mb-2"
+  [class.selected]="selected"
+  [class.bg-primary]="selected"
+  [class.text-white]="selected"
+  [class.bg-white]="!selected"
+  [class.text-dark]="!selected"
+  tabindex="0"
+  (click)="onStepClick()">
+  <span class="icon fs-3">{{ icon }}</span>
+  <span class="fw-semibold fs-6">{{ label }}</span>
+</button>

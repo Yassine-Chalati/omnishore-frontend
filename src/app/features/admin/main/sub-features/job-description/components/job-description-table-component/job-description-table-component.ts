@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { PrimaryButtonComponent } from "../../../../../../../shared/components/primary-button-component/primary-button-component";
 import { JobDescriptionFile } from '../../../../../../../core/models/job-description-file.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-job-description-table-component',
@@ -31,8 +32,15 @@ import { JobDescriptionFile } from '../../../../../../../core/models/job-descrip
 export class CvTableComponent {
   currentPage = 1;
   itemsPerPage = 7;
+  @Output() filePopUpClicked = new EventEmitter<void>();
+
+  constructor(private router: Router) {}
 
   @Input() jobDescriptionFileList: JobDescriptionFile[] = [];
+
+  showMatchingList(id:number) {
+    this.router.navigate(['/admin/matching', id]);
+  }
 
   get totalPages() {
     return Math.ceil(this.jobDescriptionFileList.length / this.itemsPerPage);
@@ -46,5 +54,9 @@ export class CvTableComponent {
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
+  }
+
+  onShowFilePopUpClicked() {
+    this.filePopUpClicked.emit();
   }
 }

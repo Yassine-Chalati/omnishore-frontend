@@ -1,0 +1,72 @@
+/* Close button zoom and color on hover */
+.close-zoom-btn:hover {
+  color: #e75480 !important;
+  transform: scale(1.18);
+  background: transparent;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 40px;
+  background-color: #f5f7fa;
+
+  .steps {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 20px;
+
+    app-step-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 12px;
+
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+      }
+    }
+  }
+
+  .form-content {
+    flex: 1;
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+    animation: fadeSlideIn 0.4s ease;
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+
+    .steps {
+      width: 100%;
+      flex-direction: row;
+      overflow-x: auto;
+    }
+
+    .form-content {
+      padding: 20px;
+    }
+  }
+}

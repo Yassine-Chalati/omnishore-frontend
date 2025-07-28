@@ -1,0 +1,49 @@
+.mb-4 h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #222 !important;
+}
+
+
+form {
+  margin-top: 1.5rem;
+}
+
+.form-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222 !important;
+  display: block !important;
+  opacity: 1 !important;
+  background: none !important;
+  position: static !important;
+  z-index: 1 !important;
+}
+
+.form-control[readonly] {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  min-height: 48px;
+  color: #222;
+  box-shadow: none;
+  border: 1px solid #d1d5db;
+}
+
+.row.mb-3 {
+  row-gap: 2.2rem;
+}
+.form-check-label {
+  color: #222 !important;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.form-check-input:checked {
+  background-color: #222 !important;
+  border-color: #222 !important;
+}
+.pays-input {
+  max-width: 300px;
+}

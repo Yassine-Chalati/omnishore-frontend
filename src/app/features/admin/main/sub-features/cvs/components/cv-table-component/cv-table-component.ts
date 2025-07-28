@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { CvFile } from '../../../../../../../core/models/cv-file.model';
@@ -33,6 +33,8 @@ export class CvTableComponent {
   itemsPerPage = 7;
 
   @Input() cvFileList: CvFile[] = [];
+  @Output() structuredCvFormClicked = new EventEmitter<void>();
+  @Output() filePopUpClicked = new EventEmitter<void>();
 
   get totalPages() {
     return Math.ceil(this.cvFileList.length / this.itemsPerPage);
@@ -46,5 +48,13 @@ export class CvTableComponent {
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
+  }
+
+  onShowStructuredCvFormClicked() {
+    this.structuredCvFormClicked.emit();
+  }
+
+  onShowFilePopUpClicked() {
+    this.filePopUpClicked.emit();
   }
 }

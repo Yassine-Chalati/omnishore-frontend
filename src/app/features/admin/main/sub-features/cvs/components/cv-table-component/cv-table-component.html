@@ -11,12 +11,16 @@
     <tbody [@fadeInPage]="currentPage">
       <tr *ngFor="let cv of paginatedCvFileList">
         <td class="text-center">{{ cv.addedDate }}</td>
-        <td class="text-center">{{ cv.fileName }}</td>
+        <td class="text-center">
+          <a (click)="onShowFilePopUpClicked()">
+            {{ cv.fileName }}
+          </a>
+        </td>
         <td class="text-center">{{ cv.fileType }}</td>
         <td class="text-center">
           <div class="d-flex justify-content-center align-items-center">
             <!-- <button class="btn btn-sm btn-primary custom-download-btn">Afficher fichier candidat</button> -->
-            <app-primary-button-component icon="bi bi-list-ol" label="Afficher fichier candidat"></app-primary-button-component>
+            <app-primary-button-component (click)="onShowStructuredCvFormClicked()" icon="bi bi-list-ol" label="Afficher fichier candidat"></app-primary-button-component>
             <!-- <button class="btn btn-sm btn-danger ms-2">Delete</button> -->
           </div>
         </td>

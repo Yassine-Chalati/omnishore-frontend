@@ -12,7 +12,19 @@
           <app-upload-files-component [allowMultiple]="true" (closed)="closeUploadModal()"></app-upload-files-component>
         </div>
       </ng-container>
+      <ng-container *ngIf="showStructuredCvFormModal">
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+          <app-structured-cv-form-component (closed)="closeStructuredCvFormModal()"></app-structured-cv-form-component>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="showFilePopUpModal">
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+          <app-file-pop-up-component></app-file-pop-up-component>
+        </div>
+      </ng-container>
     </div>
-    <app-cv-table-component [cvFileList]="cvList"></app-cv-table-component>
+    <app-cv-table-component (structuredCvFormClicked)="openStructuredCvFormModal()" (filePopUpClicked)="openFilePopUpModal()" [cvFileList]="cvList"></app-cv-table-component>
   </div>
 </div>

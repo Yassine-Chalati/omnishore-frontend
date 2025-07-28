@@ -19,7 +19,13 @@
           <app-prompt-component (closed)="closePromptModal()"></app-prompt-component>
         </div>
       </ng-container>
+      <ng-container *ngIf="showFilePopUpModal">
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+          <app-file-pop-up-component></app-file-pop-up-component>
+        </div>
+      </ng-container>
     </div>
-    <app-job-description-table-component [jobDescriptionFileList]="jobDescriptionsFileList"></app-job-description-table-component>
+    <app-job-description-table-component [jobDescriptionFileList]="jobDescriptionsFileList" (filePopUpClicked)="openFilePopUpModal()"></app-job-description-table-component>
   </div>
 </div>

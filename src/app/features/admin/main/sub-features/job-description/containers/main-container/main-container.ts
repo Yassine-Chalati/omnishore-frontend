@@ -7,10 +7,11 @@ import { NgIf } from '@angular/common';
 import { CvTableComponent } from "../../components/job-description-table-component/job-description-table-component";
 import { JobDescriptionFile } from '../../../../../../../core/models/job-description-file.model';
 import { PromptComponent } from "../../components/prompt-component/prompt-component";
+import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
 
 @Component({
   selector: 'app-main-container',
-  imports: [ToastComponent, PrimaryButtonComponent, UploadFilesComponent, NgIf, CvTableComponent, PromptComponent],
+  imports: [ToastComponent, PrimaryButtonComponent, UploadFilesComponent, NgIf, CvTableComponent, PromptComponent, FilePopUpComponent],
   templateUrl: './main-container.html',
   styleUrl: './main-container.css',
   standalone: true,
@@ -52,6 +53,7 @@ import { PromptComponent } from "../../components/prompt-component/prompt-compon
 export class MainContainer {
   showUploadModal = false;
   showPromptModal = false;
+  showFilePopUpModal = false;
 
   openUploadModal() {
     this.showUploadModal = true;
@@ -67,6 +69,14 @@ export class MainContainer {
 
   closePromptModal() {
     this.showPromptModal = false;
+  }
+
+  openFilePopUpModal() {
+    this.showFilePopUpModal = true;
+  }
+  
+  closeFilePopUpModal() {
+    this.showFilePopUpModal = false;
   }
 
 // static data -------------------

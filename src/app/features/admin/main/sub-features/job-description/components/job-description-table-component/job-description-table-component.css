@@ -69,3 +69,6 @@
   overflow: hidden;
 }
 
+a {
+  cursor: pointer;
+}
