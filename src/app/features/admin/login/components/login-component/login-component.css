@@ -1,0 +1,16 @@
+/* Loader SVG for login button */
+.login-loader-svg {
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 1px 2px rgba(48,36,92,0.12));
+}
+
+.loader-dot {
+  transform-origin: 25px 25px;
+  animation: moveDot 0.8s linear infinite;
+}
+
+@keyframes moveDot {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

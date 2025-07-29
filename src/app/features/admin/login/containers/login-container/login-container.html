@@ -1,1 +1,17 @@
-<app-login-component></app-login-component>
+<div class="login-page-wrapper">
+  <app-login-component
+    [loading]="loading"
+    (login)="onLogin($event)"
+  ></app-login-component>
+
+  <div style="position: fixed; left: 2rem; bottom: 2rem; z-index: 2000; display: flex; flex-direction: column-reverse; gap: 0.5rem; pointer-events: none;">
+    <ng-container *ngFor="let toast of toasts">
+      <app-toast-component
+        [color]="toast.color"
+        [message]="toast.message"
+        (animationDone)="removeToast(toast.id)"
+        style="pointer-events: auto; margin-bottom: 0;"
+      ></app-toast-component>
+    </ng-container>
+  </div>
+</div>

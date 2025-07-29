@@ -1,11 +1,12 @@
 // Removed accidental top-level getProgressBarColor function
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-toast-component',
-  imports: [NgClass],
+  imports: [CommonModule, NgClass],
   templateUrl: './toast-component.html',
   styleUrl: './toast-component.css',
   animations: [
@@ -21,10 +22,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
 })
 export class ToastComponent implements OnInit, OnDestroy {
+  @Output() animationDone = new EventEmitter<void>();
   getProgressBarColor() {
-    if (this.color === 'success') return '#28a745';
-    if (this.color === 'error') return '#dc3545';
-    if (this.color === 'warning') return '#ffc107';
     return '#fff';
   }
   /**
@@ -48,6 +47,7 @@ export class ToastComponent implements OnInit, OnDestroy {
       if (this.progress <= 0) {
         this.progress = 0;
         clearInterval(this.timer);
+        this.animationDone.emit();
       }
     }, 50);
   }

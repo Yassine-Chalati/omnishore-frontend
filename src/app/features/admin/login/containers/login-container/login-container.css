@@ -1,0 +1,5 @@
+/* Hide vertical scrollbar only on login page */
+.login-page-wrapper {
+  min-height: 100vh;
+  overflow-y: hidden;
+}

@@ -1,8 +1,6 @@
 <div *ngIf="modalState === 'enter' || modalState === 'leave'" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-  <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1;"
-    [@modalAnim]="modalState === 'leave' ? 'leave' : 'enter'"
-    (@modalAnim.done)="onModalAnimDone($event)"></div>
-  <div class="modal-content" [@modalAnim]="modalState" (@modalAnim.done)="onModalAnimDone($event)">
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1;"></div>
+  <div class="modal-content" style="z-index: 1051; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch;" [@modalAnim]="modalState" (@modalAnim.done)="onModalAnimDone($event)">
     <app-multi-step-form (closed)="closeModal()"></app-multi-step-form>
   </div>
 </div>

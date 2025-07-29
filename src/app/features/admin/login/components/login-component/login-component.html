@@ -22,7 +22,8 @@
       Connectez-vous à votre espace RH
     </p>
 
-    <form (submit)="login()" novalidate>
+
+    <form (ngSubmit)="onSubmit($event)" novalidate>
       <input
         type="text"
         placeholder="Nom d'utilisateur"
@@ -31,6 +32,7 @@
         required
         class="form-control mb-3"
         style="border-color: #30245c; color: #30245c;"
+        [readonly]="loading"
       />
       <input
         type="password"
@@ -40,24 +42,32 @@
         required
         class="form-control mb-3"
         style="border-color: #30245c; color: #30245c;"
+        [readonly]="loading"
       />
 
       <button
         type="submit"
-        class="btn w-100 fw-bold mt-5"
+        class="btn w-100 fw-bold mt-5 position-relative overflow-hidden"
+        [@clickAnim]="buttonState"
         [disabled]="loading"
-        style="background: #30245c; color: #fff; border: none;"
+        style="background: #30245c; color: #fff; border: none; min-height: 38px;"
       >
-        <span *ngIf="!loading">Se connecter</span>
-        <span
-          *ngIf="loading"
-          class="spinner-border spinner-border-sm text-light"
-          role="status"
-          aria-hidden="true"
-        ></span>
+        <ng-container *ngIf="!loading; else loaderTpl">
+          <span>Se connecter</span>
+        </ng-container>
+        <ng-template #loaderTpl>
+          <svg
+            class="login-loader-svg position-absolute top-50 start-50 translate-middle"
+            width="28" height="28" viewBox="0 0 50 50"
+            style="pointer-events: none;"
+            [@spinnerFade]
+          >
+            <circle cx="25" cy="25" r="20" fill="none" stroke="#fff" stroke-width="5" opacity="0.2" />
+            <circle class="loader-dot" cx="25" cy="7" r="4" fill="#fff" />
+          </svg>
+        </ng-template>
       </button>
     </form>
 
-    <p *ngIf="error" class="text-danger mt-3 text-center">{{ error }}</p>
   </div>
 </div>

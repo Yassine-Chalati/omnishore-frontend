@@ -11,7 +11,7 @@
   [style.position]="'relative'"
 >
   <span class="toast-message">{{ message }}</span>
-  <div class="toast-progress-border" [style.background]="getProgressBarColor()">
-    <div class="toast-progress-bar" [style.width.%]="progress"></div>
+  <div class="toast-progress-border">
+    <div class="toast-progress-bar" *ngIf="progress > 0" [style.width.%]="progress"></div>
   </div>
 </div>
