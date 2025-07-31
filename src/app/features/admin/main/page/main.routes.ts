@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '../../../../core/guards/admin.guard';
 import { MainPage } from './main-page/main-page';
 import { cvRoutes } from '../sub-features/cvs/page/cv.routes';
 import { jobDescriptionRoutes } from '../sub-features/job-description/page/job-description.routes';
@@ -8,6 +9,7 @@ export const mainRoutes: Routes = [
   {
     path: 'admin',
     component: MainPage,
+    canActivate: [adminGuard],
     children: [
       { path: 'cv', children: cvRoutes },
       { path: 'job-description', children: jobDescriptionRoutes },

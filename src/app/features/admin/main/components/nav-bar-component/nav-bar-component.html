@@ -1,4 +1,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark py-2" style="background-color: #30245c; font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;" @fadeIn>
+  <!-- Toast notifications at bottom left -->
+  <div style="position: fixed; left: 1.5rem; bottom: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;">
+    <app-toast-component
+      *ngFor="let toast of toasts"
+      [message]="toast.message"
+      [color]="toast.color"
+      (animationDone)="removeToast(toast.id)"
+    ></app-toast-component>
+  </div>
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center me-2" href="#" (click)="goTo(logoUrl)">
       <span style="font-weight:700; font-size:1.35rem; letter-spacing:0.5px;">
@@ -47,4 +56,5 @@
       </ul>
     </div>
   </div>
+  <app-loader-component *ngIf="showLoader" [loaderMessage]="'Déconnexion en cours...'" [modalState]="'enter'"></app-loader-component>
 </nav>

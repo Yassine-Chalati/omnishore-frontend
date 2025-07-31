@@ -2,6 +2,9 @@ import { Component, HostListener, Output, EventEmitter, Input } from '@angular/c
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { ToastComponent } from '../../../core/components/toast-component/toast-component';
+// Remove CvService import
+// import { CvService } from '../../../core/services/cv-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-upload-files-component',
@@ -31,11 +34,17 @@ import { ToastComponent } from '../../../core/components/toast-component/toast-c
 })
 export class UploadFilesComponent {
   /**
+   * Tracks the upload state for each file: 'idle' | 'uploading' | 'success' | 'error'
+   */
+  fileUploadStates: Array<'idle' | 'ready' | 'uploading' | 'success' | 'error'> = [];
+  fileLoadProgress: number[] = [];
+  /**
    * Toast stack array
    */
   toasts: Array<{ id: number; color: string; message: string }> = [];
   toastIdCounter = 0;
   @Output() closed = new EventEmitter<void>();
+  @Output() fileUpload = new EventEmitter<{ file: File; index: number }>();
   @Input() allowMultiple: boolean = true;
   @Input() maxFileSizeMb: number = 10;
   /**
@@ -44,16 +53,37 @@ export class UploadFilesComponent {
   @Input() toastPosition: 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' = 'bottom-left';
   modalState: 'enter' | 'leave' = 'enter';
 
+  files: File[] = [];
+  dragOver = false;
+  progress = 0;
+  uploading = false;
+
+  constructor() {}
+
+
+  hasReadyFiles(): boolean {
+    return this.fileUploadStates.some(state => state === 'ready');
+  }
+
   deleteAllFiles() {
     this.files = [];
+    this.fileUploadStates = [];
   }
 
   closeModal() {
+    const hadFiles = this.files.length > 0;
     this.files = [];
     this.modalState = 'leave';
     setTimeout(() => {
       this.closed.emit();
       this.modalState = 'enter';
+      if (hadFiles) {
+        setTimeout(() => {
+          if (window.confirm('Voulez-vous rafraîchir la page pour voir les nouvelles données ?')) {
+            window.location.reload();
+          }
+        }, 100);
+      }
     }, 200); // match leave animation duration
   }
 
@@ -86,16 +116,11 @@ export class UploadFilesComponent {
     }
     if (droppedOutside && event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
       this.handleFiles(event.dataTransfer.files);
-      // Debug: log and trigger upload
-      console.log('Dropped files outside modal, uploading...');
-      this.sendFiles();
+      // Debug: log file drop
+      console.log('Dropped files outside modal.');
     }
     // If dropped inside modal, do nothing (handled by onDrop)
   }
-  files: File[] = [];
-  dragOver = false;
-  uploading = false;
-  progress = 0;
 
   onFileSelected(event: any) {
     const selectedFiles = event.target.files as FileList;
@@ -104,34 +129,46 @@ export class UploadFilesComponent {
 
   handleFiles(fileList: FileList) {
     const maxBytes = this.maxFileSizeMb * 1024 * 1024;
-    if (!this.allowMultiple) {
-      // Only accept the first file if present and valid
-      if (fileList.length > 0) {
-        const file = fileList[0];
-        if (file.size > maxBytes) {
-          this.showToastMsg('error', `Le fichier ${file.name} dépasse la taille maximale de ${this.maxFileSizeMb} Mo.`);
-          this.files = [];
-        } else {
-          this.files = [file];
-        }
-        if (fileList.length > 1) {
-          this.showToastMsg('warning', 'Vous ne pouvez télécharger qu’un seul fichier à la fois.');
-        }
-      } else {
-        this.files = [];
+    let filesToAdd: File[] = [];
+    let statesToAdd: Array<'idle' | 'ready' | 'uploading' | 'success' | 'error'> = [];
+    let progressToAdd: number[] = [];
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      if (file.size > maxBytes) {
+        this.showToastMsg('error', `Le fichier ${file.name} dépasse la taille maximale de ${this.maxFileSizeMb} Mo.`);
+        continue;
       }
-    } else {
-      let filesToAdd: File[] = [];
-      for (let i = 0; i < fileList.length; i++) {
-        const file = fileList[i];
-        if (file.size > maxBytes) {
-          this.showToastMsg('error', `Le fichier ${file.name} dépasse la taille maximale de ${this.maxFileSizeMb} Mo.`);
-          continue;
-        }
-        filesToAdd.push(file);
+      // Check for duplicate (same name and size)
+      const duplicate = this.files.some(f => f.name === file.name && f.size === file.size);
+      if (duplicate || filesToAdd.some(f => f.name === file.name && f.size === file.size)) {
+        this.showToastMsg('info', `Le fichier "${file.name}" existe déjà.`);
+        continue;
       }
-      this.files.push(...filesToAdd);
+      filesToAdd.push(file);
+      statesToAdd.push('idle');
+      progressToAdd.push(0);
+      this.simulateFileLoad(this.files.length + filesToAdd.length - 1, file);
     }
+    this.files.push(...filesToAdd);
+    this.fileUploadStates.push(...statesToAdd);
+    this.fileLoadProgress.push(...progressToAdd);
+  }
+
+  simulateFileLoad(index: number, file: File) {
+    // Simulate file load progress (since File API doesn't provide progress for local files)
+    let progress = 0;
+    const step = () => {
+      if (progress < 100) {
+        progress += Math.floor(Math.random() * 20) + 10;
+        if (progress > 100) progress = 100;
+        this.fileLoadProgress[index] = progress;
+        setTimeout(step, 40 + Math.random() * 60);
+      } else {
+        this.fileUploadStates[index] = 'ready';
+        this.fileLoadProgress[index] = 100;
+      }
+    };
+    step();
   }
 
   showToastMsg(color: string, message: string) {
@@ -162,6 +199,7 @@ export class UploadFilesComponent {
 
   removeFile(index: number) {
     this.files.splice(index, 1);
+    this.fileUploadStates.splice(index, 1);
   }
 
   downloadFile(file: File) {
@@ -173,19 +211,27 @@ export class UploadFilesComponent {
     URL.revokeObjectURL(url);
   }
 
+
+  /**
+   * Called when the user clicks the upload button. Sets each file's state to 'uploading', emits each file one by one.
+   * The parent should call updateFileUploadState(index, 'success' | 'error') when upload completes.
+   */
   sendFiles() {
     if (this.files.length === 0) return;
-    this.uploading = true;
-    this.progress = 0;
-    // Simulate upload
-    const interval = setInterval(() => {
-      this.progress += 10;
-      if (this.progress >= 100) {
-        clearInterval(interval);
-        this.uploading = false;
-        this.progress = 100;
-        setTimeout(() => { this.progress = 0; }, 1000);
+    for (let i = 0; i < this.files.length; i++) {
+      if (this.fileUploadStates[i] === 'ready') {
+        this.fileUploadStates[i] = 'uploading';
+        this.fileUpload.emit({ file: this.files[i], index: i });
       }
-    }, 120);
+    }
   }
+
+  /**
+   * Called by the parent to update the upload state of a file (by index)
+   */
+  updateFileUploadState(index: number, state: 'success' | 'error') {
+    this.fileUploadStates[index] = state;
+  }
+
+  ngOnDestroy() {}
 }

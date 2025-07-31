@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { ToastComponent } from '../../../../../../../core/components/toast-component/toast-component';
 import { trigger, state, style, animate, transition, keyframes } from '@angular/animations';
@@ -7,12 +7,13 @@ import { UploadFilesComponent } from '../../../../../../../shared/components/upl
 import { PrimaryButtonComponent } from '../../../../../../../shared/components/primary-button-component/primary-button-component';
 import { StructuredCvFormComponent } from '../../../../../../../shared/components/structured-cv-from-component/structured-cv-form-component';
 import { CvFile } from '../../../../../../../core/models/cv-file.model';
+import { CvService } from '../../../../../../../core/services/cv-service';
 import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
-
+import { LoaderComponent } from '../../../../../../../shared/components/loader-component/loader-component';
 
 @Component({
   selector: 'app-main-container',
-  imports: [PrimaryButtonComponent, CvTableComponent, UploadFilesComponent, ToastComponent, NgIf, StructuredCvFormComponent, FilePopUpComponent],
+  imports: [PrimaryButtonComponent, CvTableComponent, UploadFilesComponent, ToastComponent, NgIf, StructuredCvFormComponent, FilePopUpComponent, LoaderComponent],
   templateUrl: './main-container.html',
   styleUrl: './main-container.css',
   standalone: true,
@@ -51,10 +52,53 @@ import { FilePopUpComponent } from "../../../../../../../shared/components/file-
     ])
   ]
 })
-export class MainContainer {
+export class MainContainer implements OnInit {
+  @ViewChild('uploadFilesComp') uploadFilesComponent!: UploadFilesComponent;
   showUploadModal = false;
   showStructuredCvFormModal = false;
   showFilePopUpModal = false;
+
+  cvList: CvFile[] = [];
+  totalPages = 1;
+  totalElements = 0;
+  pageSize = 5;
+  currentPage = 0;
+  loading = false;
+
+  toastMessage: string | null = null;
+  toastColor: string = 'info';
+
+  constructor(private cvService: CvService) {}
+
+  ngOnInit() {
+    this.fetchCvFiles();
+  }
+
+  fetchCvFiles(page: number = 0) {
+    this.loading = true;
+    this.toastMessage = null;
+    this.cvService.getCvFiles(page, this.pageSize, 'addedDate,desc').subscribe({
+      next: (res) => {
+        this.cvList = res.content;
+        this.totalPages = res.totalPages;
+        this.totalElements = res.totalElements;
+        this.currentPage = res.number;
+        this.pageSize = res.size;
+        this.toastColor = 'success';
+        this.toastMessage = 'CVs chargés avec succès!';
+      },
+      error: () => {
+        this.toastColor = 'red';
+        this.toastMessage = 'Erreur lors du chargement des CVs.';
+      },
+      complete: () => {
+        this.loading = false;
+        if (this.toastMessage) {
+          setTimeout(() => { this.toastMessage = null; }, 3000);
+        }
+      }
+    });
+  }
 
   openUploadModal() {
     this.showUploadModal = true;
@@ -87,15 +131,25 @@ export class MainContainer {
     this.showFilePopUpModal = false;
   }
 
-// static data -------------------
-  cvList: CvFile[] = [
-    ...Array.from({ length: 100 }, (_, i) => ({
-      id: i + 1,
-      fileName: `cv_test${i + 1}.${['pdf','docx','pptx','doc'][i%4]}`,
-      addedDate: `2025-07-${(21 - (i % 30)).toString().padStart(2, '0')}`,
-      imageUrl: '',
-      fileType: ['PDF','DOCX','PPTX','DOC'][i%4]
-    }))
-  ];
-// ----------------------------
+  onFileUpload(event: { file: File; index: number }) {
+    const { file, index } = event;
+    this.cvService.uploadCvFile(file).subscribe({
+      next: (res) => {
+        if (res.type === 4) {
+          this.uploadFilesComponent.updateFileUploadState(index, 'success');
+          this.toastColor = 'success';
+          this.toastMessage = 'Fichier téléchargé et vérifié !';
+        }
+      },
+      error: () => {
+        this.uploadFilesComponent.updateFileUploadState(index, 'error');
+        this.toastColor = 'red';
+        this.toastMessage = 'Erreur lors du téléchargement du fichier.';
+      },
+      complete: () => {
+        setTimeout(() => { this.toastMessage = null; }, 3000);
+      }
+    });
+  }
+
 }

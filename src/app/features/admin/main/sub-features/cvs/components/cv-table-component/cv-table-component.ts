@@ -29,25 +29,25 @@ import { PrimaryButtonComponent } from "../../../../../../../shared/components/p
   ]
 })
 export class CvTableComponent {
-  currentPage = 1;
-  itemsPerPage = 7;
-
   @Input() cvFileList: CvFile[] = [];
+  @Input() currentPage = 1;
+  @Input() totalPages = 1;
+  @Input() loading = false;
   @Output() structuredCvFormClicked = new EventEmitter<void>();
   @Output() filePopUpClicked = new EventEmitter<void>();
-
-  get totalPages() {
-    return Math.ceil(this.cvFileList.length / this.itemsPerPage);
-  }
-
-  get paginatedCvFileList() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    return this.cvFileList.slice(start, start + this.itemsPerPage);
-  }
+  @Output() pageChange = new EventEmitter<number>();
 
   goToPage(page: number) {
-    if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
+    if (page < 0 || page >= this.totalPages) return; // Adjusted for zero-based indexing
+    this.loading = true; // Set loading state to true
+    console.log('Navigating to page:', page); // Debugging log
+    this.pageChange.emit(page); // Emit the page number
+
+    // Simulate backend request completion
+    setTimeout(() => {
+      this.currentPage = page; // Update currentPage after backend response
+      this.loading = false; // Reset loading state
+    }, 500); // Adjust timeout to match backend response time
   }
 
   onShowStructuredCvFormClicked() {

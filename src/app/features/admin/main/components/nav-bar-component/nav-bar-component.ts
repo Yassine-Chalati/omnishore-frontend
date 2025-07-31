@@ -1,13 +1,16 @@
 // ...existing code...
 import { Component, Input } from '@angular/core';
+import { ToastComponent } from '../../../../../core/components/toast-component/toast-component';
+import { AuthenticationService } from '../../../../../core/services/authentication-service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
 import { filter } from 'rxjs/operators';
+import { LoaderComponent } from '../../../../../shared/components/loader-component/loader-component';
 
 @Component({
   selector: 'app-nav-bar-component',
-  imports: [CommonModule],
+  imports: [CommonModule, ToastComponent, LoaderComponent],
   templateUrl: './nav-bar-component.html',
   styleUrl: './nav-bar-component.css',
   standalone: true,
@@ -47,6 +50,8 @@ import { filter } from 'rxjs/operators';
   ]
 })
 export class NavBarComponent {
+  toasts: { id: number; message: string; color: string }[] = [];
+  private toastId = 0;
   @Input() logoUrl = '';
   @Input() cvUrl = '/cv';
   @Input() jobDescriptionUrl = '/job-description';
@@ -76,11 +81,12 @@ export class NavBarComponent {
   }
 
   selectedTab: string = 'cv';
+  showLoader = false;
 
- constructor(
+  constructor(
     private router: Router,
-    private route: ActivatedRoute
-    // private keycloakService: KeycloakService 
+    private route: ActivatedRoute,
+    private authenticationService: AuthenticationService
   ) {
     this.router.events
     .pipe(filter(event => event instanceof NavigationEnd))
@@ -114,13 +120,32 @@ export class NavBarComponent {
   }
 
   logout() {
+    this.showLoader = true;
     this.clickStates['logout'] = 'clicked';
     setTimeout(() => {
       this.clickStates['logout'] = 'default';
-      this.router.navigate([this.logoutUrl]);
     }, 150);
-    // this.keycloakService.logout({
-    //   redirectUri: window.location.origin + '/login'
-    // });
+    this.authenticationService.logout().subscribe({
+      next: () => {
+        this.toasts.push({ id: ++this.toastId, message: 'Déconnexion réussie', color: 'success' });
+        this.showLoader = false;
+        this.router.navigate([this.logoutUrl]);
+      },
+      error: () => {
+        const errorToastId = ++this.toastId;
+        this.toasts.push({ id: errorToastId, message: 'Erreur lors de la déconnexion', color: 'error' });
+        // Keep loader and toast visible for 5 seconds
+        setTimeout(() => {
+          this.showLoader = false;
+          this.removeToast(errorToastId);
+          localStorage.removeItem('token');
+          this.router.navigate([this.logoutUrl]);
+        }, 5000);
+      }
+    });
+  }
+
+  removeToast(id: number) {
+    this.toasts = this.toasts.filter(t => t.id !== id);
   }
 }
