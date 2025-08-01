@@ -34,7 +34,7 @@ export class CvTableComponent {
   @Input() totalPages = 1;
   @Input() loading = false;
   @Output() structuredCvFormClicked = new EventEmitter<void>();
-  @Output() filePopUpClicked = new EventEmitter<void>();
+  @Output() filePopUpClicked = new EventEmitter<CvFile>();
   @Output() pageChange = new EventEmitter<number>();
 
   goToPage(page: number) {
@@ -54,7 +54,7 @@ export class CvTableComponent {
     this.structuredCvFormClicked.emit();
   }
 
-  onShowFilePopUpClicked() {
-    this.filePopUpClicked.emit();
+  onShowFilePopUpClicked(cv: CvFile) {
+    this.filePopUpClicked.emit(cv);
   }
 }

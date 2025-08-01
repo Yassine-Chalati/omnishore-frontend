@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { ToastComponent } from '../../../../../../../core/components/toast-component/toast-component';
 import { trigger, state, style, animate, transition, keyframes } from '@angular/animations';
 import { CvTableComponent } from '../../components/cv-table-component/cv-table-component';
@@ -10,10 +10,11 @@ import { CvFile } from '../../../../../../../core/models/cv-file.model';
 import { CvService } from '../../../../../../../core/services/cv-service';
 import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
 import { LoaderComponent } from '../../../../../../../shared/components/loader-component/loader-component';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-main-container',
-  imports: [PrimaryButtonComponent, CvTableComponent, UploadFilesComponent, ToastComponent, NgIf, StructuredCvFormComponent, FilePopUpComponent, LoaderComponent],
+  imports: [PrimaryButtonComponent, CvTableComponent, UploadFilesComponent, ToastComponent, NgIf, NgFor, StructuredCvFormComponent, FilePopUpComponent, LoaderComponent],
   templateUrl: './main-container.html',
   styleUrl: './main-container.css',
   standalone: true,
@@ -53,10 +54,25 @@ import { LoaderComponent } from '../../../../../../../shared/components/loader-c
   ]
 })
 export class MainContainer implements OnInit {
+
+  onNoFilesReady() {
+    this.showToast('warning', 'Aucun fichier prêt à être envoyé.');
+  }
+
+  toasts: Array<{ id: number; color: string; message: string }> = [];
+  toastIdCounter = 0;
+
+  onUploadCancelled() {
+    this.showToast('warning', 'Téléchargement annulé.');
+  }
   @ViewChild('uploadFilesComp') uploadFilesComponent!: UploadFilesComponent;
   showUploadModal = false;
   showStructuredCvFormModal = false;
   showFilePopUpModal = false;
+  filePopUpUrl: string | null = null;
+  filePopUpType: string = '';
+  filePopUpName: string = '';
+  filePopUpBytes: Uint8Array | ArrayBuffer | null = null;
 
   cvList: CvFile[] = [];
   totalPages = 1;
@@ -65,8 +81,7 @@ export class MainContainer implements OnInit {
   currentPage = 0;
   loading = false;
 
-  toastMessage: string | null = null;
-  toastColor: string = 'info';
+
 
   constructor(private cvService: CvService) {}
 
@@ -76,7 +91,6 @@ export class MainContainer implements OnInit {
 
   fetchCvFiles(page: number = 0) {
     this.loading = true;
-    this.toastMessage = null;
     this.cvService.getCvFiles(page, this.pageSize, 'addedDate,desc').subscribe({
       next: (res) => {
         this.cvList = res.content;
@@ -84,28 +98,30 @@ export class MainContainer implements OnInit {
         this.totalElements = res.totalElements;
         this.currentPage = res.number;
         this.pageSize = res.size;
-        this.toastColor = 'success';
-        this.toastMessage = 'CVs chargés avec succès!';
+        this.showToast('success', 'CVs chargés avec succès!');
       },
       error: () => {
-        this.toastColor = 'red';
-        this.toastMessage = 'Erreur lors du chargement des CVs.';
+        this.showToast('red', 'Erreur lors du chargement des CVs.');
       },
       complete: () => {
         this.loading = false;
-        if (this.toastMessage) {
-          setTimeout(() => { this.toastMessage = null; }, 3000);
-        }
       }
     });
   }
 
   openUploadModal() {
     this.showUploadModal = true;
+    setTimeout(() => {
+      if (this.uploadFilesComponent && this.uploadFilesComponent.resetFiles) {
+        this.uploadFilesComponent.resetFiles();
+      }
+    });
   }
 
   closeUploadModal() {
     this.showUploadModal = false;
+    // Refresh the page automatically when the upload modal is closed
+    location.reload();
   }
 
   openStructuredCvFormModal() {
@@ -123,12 +139,73 @@ export class MainContainer implements OnInit {
     }, 200); // Match leave animation duration
   }
 
-  openFilePopUpModal() {
-    this.showFilePopUpModal = true;
+
+  openFilePopUpModal(cvFile?: CvFile) {
+    if (!cvFile) return;
+    this.cvService.downloadFileAsBlob(cvFile.imageUrl).subscribe({
+      next: (blob) => {
+        if (this.filePopUpUrl) {
+          URL.revokeObjectURL(this.filePopUpUrl);
+        }
+        if (cvFile.fileType.toLowerCase() === 'application/pdf') {
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.filePopUpUrl = reader.result as string;
+            this.filePopUpUrl = this.filePopUpUrl.replace('data:application/octet-stream', 'data:application/pdf');
+            this.showFilePopUpModal = true;
+          };
+          reader.readAsDataURL(blob);
+        } else if (cvFile.fileType.toLowerCase().startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const pdf = new jsPDF({ unit: 'px', format: [img.width, img.height] });
+
+              // Embed the image without compression
+              pdf.addImage(reader.result as string, 'JPEG', 0, 0, img.width, img.height);
+
+              const pdfBlob = pdf.output('blob');
+              this.filePopUpUrl = URL.createObjectURL(pdfBlob);
+              this.filePopUpType = 'application/pdf';
+              this.showFilePopUpModal = true;
+            };
+            img.src = reader.result as string;
+          };
+          reader.readAsDataURL(blob);
+        } else {
+          this.filePopUpUrl = URL.createObjectURL(blob);
+          this.showFilePopUpModal = true;
+        }
+
+        // Convert Blob to ArrayBuffer
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.filePopUpBytes = reader.result as ArrayBuffer; // Pass the original file byte stream to the FilePopUpComponent
+        };
+        reader.readAsArrayBuffer(blob);
+
+        this.filePopUpType = cvFile.fileType.toLowerCase(); // Use fileType from CvFile
+        this.filePopUpName = cvFile.fileName;
+        console.log('File URL:', this.filePopUpUrl);
+        console.log('File Type:', this.filePopUpType);
+        console.log('File Name:', this.filePopUpName);
+      },
+      error: (err) => {
+        console.error('Error loading file:', err);
+        this.showToast('red', 'Erreur lors du chargement du fichier.');
+      }
+    });
   }
 
   closeFilePopUpModal() {
     this.showFilePopUpModal = false;
+    if (this.filePopUpUrl) {
+      URL.revokeObjectURL(this.filePopUpUrl);
+      this.filePopUpUrl = null;
+    }
+    this.filePopUpType = '';
+    this.filePopUpName = '';
   }
 
   onFileUpload(event: { file: File; index: number }) {
@@ -137,19 +214,27 @@ export class MainContainer implements OnInit {
       next: (res) => {
         if (res.type === 4) {
           this.uploadFilesComponent.updateFileUploadState(index, 'success');
-          this.toastColor = 'success';
-          this.toastMessage = 'Fichier téléchargé et vérifié !';
+          this.showToast('success', 'Fichier téléchargé et vérifié !');
         }
       },
       error: () => {
         this.uploadFilesComponent.updateFileUploadState(index, 'error');
-        this.toastColor = 'red';
-        this.toastMessage = 'Erreur lors du téléchargement du fichier.';
+        this.showToast('red', 'Erreur lors du téléchargement du fichier.');
       },
       complete: () => {
-        setTimeout(() => { this.toastMessage = null; }, 3000);
+        // No need for setTimeout here
       }
     });
   }
+
+  private showToast(color: string, message: string) {
+    const id = ++this.toastIdCounter;
+    this.toasts.push({ id, color, message });
+  }
+
+  onToastDone(id: number) {
+    this.toasts = this.toasts.filter(t => t.id !== id);
+  }
+
 
 }

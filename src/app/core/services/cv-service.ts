@@ -10,6 +10,7 @@ import { CvFilePage } from '../models/cv-file-page.model';
 export class CvService {
   private apiUrl = environment.backendUrl + '/api/cv/all';
   private uploadUrl = environment.backendUrl + '/api/cv/upload';
+  private downloadBaseUrl = environment.backendUrl + '/api/cv/download';
 
   constructor(private http: HttpClient) {}
 
@@ -25,5 +26,19 @@ export class CvService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post(this.uploadUrl, formData, { reportProgress: true, observe: 'events' });
+  }
+
+  /**
+   * Returns the direct download URL for a file by id.
+   */
+  getDownloadUrl(fileId: string | number): string {
+    return `${this.downloadBaseUrl}/${fileId}`;
+  }
+
+  /**
+   * Optionally: Download the file as a Blob (not required for direct iframe/img usage)
+   */
+  downloadFileAsBlob(fileId: string | number): Observable<Blob> {
+    return this.http.get(this.getDownloadUrl(fileId), { responseType: 'blob' });
   }
 }

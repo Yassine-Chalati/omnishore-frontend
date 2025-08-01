@@ -44,7 +44,9 @@ export class UploadFilesComponent {
   toasts: Array<{ id: number; color: string; message: string }> = [];
   toastIdCounter = 0;
   @Output() closed = new EventEmitter<void>();
+  @Output() uploadCancelled = new EventEmitter<void>();
   @Output() fileUpload = new EventEmitter<{ file: File; index: number }>();
+  @Output() noFilesReady = new EventEmitter<void>();
   @Input() allowMultiple: boolean = true;
   @Input() maxFileSizeMb: number = 10;
   /**
@@ -57,6 +59,11 @@ export class UploadFilesComponent {
   dragOver = false;
   progress = 0;
   uploading = false;
+
+  /**
+   * Track all upload subscriptions so we can cancel them on modal close
+   */
+  uploadSubscriptions: Subscription[] = [];
 
   constructor() {}
 
@@ -71,20 +78,36 @@ export class UploadFilesComponent {
   }
 
   closeModal() {
-    const hadFiles = this.files.length > 0;
-    this.files = [];
+    const uploading = this.fileUploadStates.some(state => state === 'uploading');
+    if (uploading) {
+      this.uploadCancelled.emit();
+      this.showToastMsg('warning', 'Téléchargement annulé.');
+    }
+    this.cancelAllUploads();
+    this.resetFiles();
     this.modalState = 'leave';
     setTimeout(() => {
       this.closed.emit();
       this.modalState = 'enter';
-      if (hadFiles) {
-        setTimeout(() => {
-          if (window.confirm('Voulez-vous rafraîchir la page pour voir les nouvelles données ?')) {
-            window.location.reload();
-          }
-        }, 100);
-      }
     }, 200); // match leave animation duration
+  }
+
+  /**
+   * Reset all loaded files and their states (memory cleanup)
+   */
+  resetFiles() {
+    this.cancelAllUploads();
+    this.files = [];
+    this.fileUploadStates = [];
+    this.fileLoadProgress = [];
+  }
+
+  /**
+   * Cancel all ongoing upload subscriptions
+   */
+  cancelAllUploads() {
+    this.uploadSubscriptions.forEach(sub => sub.unsubscribe());
+    this.uploadSubscriptions = [];
   }
 
   // Enable drag-and-drop for the whole page
@@ -217,12 +240,20 @@ export class UploadFilesComponent {
    * The parent should call updateFileUploadState(index, 'success' | 'error') when upload completes.
    */
   sendFiles() {
-    if (this.files.length === 0) return;
+    if (this.files.length === 0) {
+      this.noFilesReady.emit();
+      return;
+    }
+    let anyReady = false;
     for (let i = 0; i < this.files.length; i++) {
       if (this.fileUploadStates[i] === 'ready') {
         this.fileUploadStates[i] = 'uploading';
         this.fileUpload.emit({ file: this.files[i], index: i });
+        anyReady = true;
       }
+    }
+    if (!anyReady) {
+      this.noFilesReady.emit();
     }
   }
 

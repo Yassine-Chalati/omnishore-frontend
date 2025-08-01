@@ -12,7 +12,7 @@
       <tr *ngFor="let cv of cvFileList">
         <td class="text-center">{{ cv.addedDate }}</td>
         <td class="text-center">
-          <a (click)="onShowFilePopUpClicked()">
+          <a (click)="onShowFilePopUpClicked(cv)">
             {{ cv.fileName }}
           </a>
         </td>

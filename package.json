@@ -35,7 +35,10 @@
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
     "express": "^5.1.0",
+    "jspdf": "^3.0.1",
     "jwt-decode": "^4.0.0",
+    "ngx-extended-pdf-viewer": "^24.2.5",
+    "pdfjs-dist": "^5.4.54",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

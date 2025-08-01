@@ -13,6 +13,9 @@
   border-radius: 0 0 8px 8px;
   transition: width 0.2s linear;
 }
+.toast-warning .toast-progress-bar {
+  background: #2d2346;
+}
 .toast-container {
   min-width: 220px;
   max-width: 360px;
