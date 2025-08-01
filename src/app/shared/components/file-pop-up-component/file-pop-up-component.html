@@ -1,7 +1,7 @@
-<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;" >
   <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1;"></div>
-  <div class="bg-white rounded shadow p-3 position-relative" style="z-index:2; min-width: 80vw; min-height: 80vh; max-width:98vw; max-height:98vh; display:flex; flex-direction:column;">
-    <button class="btn btn-sm position-absolute top-0 end-0 close-zoom-btn" style="font-size:1.4rem; color:#30245c; background:transparent; border:none; box-shadow:none; transition: transform 0.2s, color 0.2s; margin: 1rem 1.2rem 0 0; padding: 0.3rem 0.7rem; font-weight: bold;" (click)="onClose()" title="Fermer" onmouseover="this.style.transform='scale(1.1)'; this.style.color='#e75480';" onmouseout="this.style.transform='scale(1)'; this.style.color='#30245c';">
+  <div class="bg-white rounded shadow p-3 position-relative" style="z-index:2; min-width: 80vw; min-height: 80vh; max-width:98vw; max-height:98vh; display:flex; flex-direction:column;" @popupAnimation *ngIf="isVisible" (@popupAnimation.done)="onAnimationDone($event)">
+    <button class="btn btn-sm position-absolute top-0 end-0 close-zoom-btn" style="font-size:1.4rem; color:#30245c; background:transparent; border:none; box-shadow:none; transition: transform 0.2s, color 0.2s; margin: 1rem 1.2rem 0 0; padding: 0.3rem 0.7rem; font-weight: bold;" (click)="closePopup()" title="Fermer" onmouseover="this.style.transform='scale(1.1)'; this.style.color='#e75480';" onmouseout="this.style.transform='scale(1)'; this.style.color='#30245c';">
         <i class="bi bi-x-lg" style="cursor: pointer;"></i>
     </button>
     <div class="d-flex justify-content-center align-items-center mb-3">

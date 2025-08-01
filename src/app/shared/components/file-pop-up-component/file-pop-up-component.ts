@@ -2,13 +2,25 @@ import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterVie
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PrimaryButtonComponent } from "../primary-button-component/primary-button-component";
+import { trigger, transition, style, animate, AnimationEvent } from '@angular/animations';
 
 @Component({
   selector: 'app-file-pop-up-component',
   standalone: true,
   imports: [CommonModule, PrimaryButtonComponent],
   templateUrl: './file-pop-up-component.html',
-  styleUrl: './file-pop-up-component.css'
+  styleUrls: ['./file-pop-up-component.css'],
+  animations: [
+    trigger('popupAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.8)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'scale(0.8)' }))
+      ])
+    ])
+  ]
 })
 export class FilePopUpComponent implements AfterViewInit, OnChanges {
   @Input() fileUrl: string | SafeResourceUrl | null = null;
@@ -21,6 +33,7 @@ export class FilePopUpComponent implements AfterViewInit, OnChanges {
   @ViewChild('canvas', { static: false }) canvasRef?: ElementRef<HTMLCanvasElement>;
 
   zoom = 1;
+  isVisible = true;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -89,7 +102,18 @@ export class FilePopUpComponent implements AfterViewInit, OnChanges {
     this.render();
   }
 
+  closePopup() {
+    this.isVisible = false;
+  }
+
+  onAnimationDone(event: AnimationEvent) {
+    if (event.toState === 'void') {
+      this.closed.emit();
+    }
+  }
+
   onClose() {
+    this.isVisible = false;
     this.closed.emit();
   }
 
