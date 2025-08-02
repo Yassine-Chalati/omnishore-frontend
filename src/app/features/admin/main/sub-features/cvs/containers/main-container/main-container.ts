@@ -11,6 +11,7 @@ import { CvService } from '../../../../../../../core/services/cv-service';
 import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
 import { LoaderComponent } from '../../../../../../../shared/components/loader-component/loader-component';
 import jsPDF from 'jspdf';
+import { CvStructured } from '../../../../../../../core/models/cv-structured.model';
 
 @Component({
   selector: 'app-main-container',
@@ -54,6 +55,8 @@ import jsPDF from 'jspdf';
   ]
 })
 export class MainContainer implements OnInit {
+
+  cvStructured?: CvStructured;
 
   onNoFilesReady() {
     this.showToast('warning', 'Aucun fichier prêt à être envoyé.');
@@ -124,8 +127,18 @@ export class MainContainer implements OnInit {
     location.reload();
   }
 
-  openStructuredCvFormModal() {
-    this.showStructuredCvFormModal = true;
+  openStructuredCvFormModal(cvFileId: number) {
+    this.cvService.getStructuredCv(cvFileId).subscribe({
+      next: (data) => {
+        this.cvStructured = data;
+        console.log('Structured CV:', this.cvStructured);
+        this.showStructuredCvFormModal = true;
+        this.showToast('success', `CV structuré du candidat #${cvFileId} chargé avec succès!`);
+      },
+      error: () => {
+        this.showToast('red', `Erreur lors du chargement du CV structuré du candidat #${cvFileId}.`);
+      }
+    });
   }
 
   closeStructuredCvFormModal() {
@@ -142,6 +155,8 @@ export class MainContainer implements OnInit {
 
   openFilePopUpModal(cvFile?: CvFile) {
     if (!cvFile) return;
+    this.showFilePopUpModal = true; // Show modal immediately
+    this.filePopUpUrl = null; // Reset URL to trigger loader
     this.cvService.downloadFileAsBlob(cvFile.imageUrl).subscribe({
       next: (blob) => {
         if (this.filePopUpUrl) {
@@ -185,11 +200,8 @@ export class MainContainer implements OnInit {
         };
         reader.readAsArrayBuffer(blob);
 
-        this.filePopUpType = cvFile.fileType.toLowerCase(); // Use fileType from CvFile
+        this.filePopUpType = cvFile.fileType.toLowerCase();
         this.filePopUpName = cvFile.fileName;
-        console.log('File URL:', this.filePopUpUrl);
-        console.log('File Type:', this.filePopUpType);
-        console.log('File Name:', this.filePopUpName);
       },
       error: (err) => {
         console.error('Error loading file:', err);

@@ -35,6 +35,8 @@ export class StructuredCvFormComponent {
   @Output() closed = new EventEmitter<void>();
   modalState: 'enter' | 'leave' = 'enter';
 
+  @Input() cvStructured?: import('../../../core/models/cv-structured.model').CvStructured;
+
   closeModal() {
     this.modalState = 'leave';
   }

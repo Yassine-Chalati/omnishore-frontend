@@ -26,6 +26,10 @@
   background: #30245c !important;
   border-color: #30245c !important;
   color: #fff !important;
+  box-shadow: 0 2px 8px 0 rgba(48,36,92,0.10);
+  font-weight: 700 !important;
+  outline: 2px solid #30245c !important;
+  z-index: 3;
 }
 .pagination .page-item.disabled .page-link {
   color: #bdb6d6 !important;

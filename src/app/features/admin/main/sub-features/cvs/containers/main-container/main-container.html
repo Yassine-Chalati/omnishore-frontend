@@ -21,19 +21,29 @@
       <ng-container *ngIf="showStructuredCvFormModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-structured-cv-form-component (closed)="closeStructuredCvFormModal()"></app-structured-cv-form-component>
+          <ng-container *ngIf="!cvStructured">
+            <app-loader-component [loaderMessage]="'Chargement du CV structuré...'" ></app-loader-component>
+          </ng-container>
+          <ng-container *ngIf="cvStructured">
+            <app-structured-cv-form-component [cvStructured]="cvStructured" (closed)="closeStructuredCvFormModal()"></app-structured-cv-form-component>
+          </ng-container>
         </div>
       </ng-container>
       <ng-container *ngIf="showFilePopUpModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-file-pop-up-component
-            [fileUrl]="filePopUpUrl"
-            [fileType]="filePopUpType"
-            [fileName]="filePopUpName"
-            [fileBytes]="filePopUpBytes"
-            (closed)="closeFilePopUpModal()"
-          ></app-file-pop-up-component>
+          <ng-container *ngIf="!filePopUpUrl">
+            <app-loader-component [loaderMessage]="'Chargement du fichier CV...'" ></app-loader-component>
+          </ng-container>
+          <ng-container *ngIf="filePopUpUrl">
+            <app-file-pop-up-component
+              [fileUrl]="filePopUpUrl"
+              [fileType]="filePopUpType"
+              [fileName]="filePopUpName"
+              [fileBytes]="filePopUpBytes"
+              (closed)="closeFilePopUpModal()"
+            ></app-file-pop-up-component>
+          </ng-container>
         </div>
       </ng-container>
     </div>
@@ -42,7 +52,7 @@
       [currentPage]="currentPage"
       [totalPages]="totalPages"
       [loading]="loading"
-      (structuredCvFormClicked)="openStructuredCvFormModal()"
+      (structuredCvFormClicked)="openStructuredCvFormModal($event)"
       (filePopUpClicked)="openFilePopUpModal($event)"
       (pageChange)="fetchCvFiles($event)"
     ></app-cv-table-component>

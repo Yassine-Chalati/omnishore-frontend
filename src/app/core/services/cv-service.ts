@@ -3,6 +3,7 @@ import { HttpClient, HttpParams, HttpEvent, HttpRequest } from '@angular/common/
 import { Observable } from 'rxjs';
 import { environment } from '../configurations/environment';
 import { CvFilePage } from '../models/cv-file-page.model';
+import { CvStructured } from '../models/cv-structured.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,14 @@ export class CvService {
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Fetches the structured CV format for a given CvFile id.
+   * @param id CvFile id
+   */
+  getStructuredCv(id: number): Observable<CvStructured> {
+    const url = `${environment.backendUrl}/api/cv/${id}`;
+    return this.http.get<CvStructured>(url);
+  }
   getCvFiles(page = 0, size = 5, sort = 'addedDate,desc'): Observable<CvFilePage> {
     const params = new HttpParams()
       .set('page', page)

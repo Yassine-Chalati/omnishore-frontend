@@ -20,7 +20,7 @@
         <td class="text-center">
           <div class="d-flex justify-content-center align-items-center">
             <!-- <button class="btn btn-sm btn-primary custom-download-btn">Afficher fichier candidat</button> -->
-            <app-primary-button-component (click)="onShowStructuredCvFormClicked()" icon="bi bi-list-ol" label="Afficher fichier candidat"></app-primary-button-component>
+            <app-primary-button-component (click)="onShowStructuredCvFormClicked(cv.id)" icon="bi bi-list-ol" label="Afficher fichier candidat"></app-primary-button-component>
             <!-- <button class="btn btn-sm btn-danger ms-2">Delete</button> -->
           </div>
         </td>
@@ -55,23 +55,19 @@
             <a class="page-link" href="#" (click)="goToPage(0); $event.preventDefault();">1</a>
           </li>
 
-          <!-- Ellipsis Before Current Range -->
+          <!-- Ellipsis Before Middle Pages -->
           <li class="page-item" *ngIf="currentPage > 3">
             <span class="page-link">...</span>
           </li>
 
-          <!-- Middle Pages -->
-          <ng-container *ngFor="let page of [].constructor(totalPages - 2); let i = index">
-            <li
-              class="page-item"
-              *ngIf="i + 1 >= currentPage - 2 && i + 1 <= currentPage + 2"
-              [class.active]="currentPage === (i + 1)"
-            >
-              <a class="page-link" href="#" (click)="goToPage(i + 1); $event.preventDefault();">{{ i + 1 }}</a>
+          <!-- Dynamic Middle Pages -->
+          <ng-container *ngFor="let page of getVisiblePages(); trackBy: trackByFn">
+            <li class="page-item" [class.active]="currentPage === page">
+              <a class="page-link" href="#" (click)="goToPage(page); $event.preventDefault();">{{ page + 1 }}</a>
             </li>
           </ng-container>
 
-          <!-- Ellipsis After Current Range -->
+          <!-- Ellipsis After Middle Pages -->
           <li class="page-item" *ngIf="currentPage < totalPages - 4">
             <span class="page-link">...</span>
           </li>

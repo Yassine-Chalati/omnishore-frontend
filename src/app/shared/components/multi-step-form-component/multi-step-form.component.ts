@@ -62,6 +62,7 @@ import {
   ]
 })
 export class MultiStepFormComponent implements OnChanges {
+  staticEducations: any[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
 
@@ -122,59 +123,31 @@ export class MultiStepFormComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['fiche'] && this.fiche) {
-      console.log("📥 Fiche IA reçue :", this.fiche);
-
       // Information personnelle
       this.personalInfo = {
-        name: this.fiche.name?.split(' ')[0] || '',
+        name: this.fiche.name || '',
         profil: this.fiche.profil || '',
-        adresse: this.fiche.address || '',
+        adresse: this.fiche.contact?.address || '',
         birthdate: this.fiche.birthdate || ''
       };
 
       // Études
-      try {
-        const educationArray = JSON.parse(this.fiche.education || '[]');
-        const findLine = (label: string) =>
-          educationArray.find((e: string) => e.toLowerCase().includes(label)) || '';
-
-        this.educationData = {
-          etablissement: educationArray[0] || '',
-          filiere: educationArray[1] || '',
-          pays: findLine('pays')?.split(':')[1]?.trim() || '',
-          debut: findLine('début')?.split(':')[1]?.trim() || '',
-          fin: findLine('fin')?.split(':')[1]?.trim() || '',
-          actuel: !findLine('fin')
-        };
-      } catch (e) {
-        console.error('❌ Erreur parsing education :', e);
-      }
+      this.staticEducations = this.fiche.educations || [];
+      this.educationData = this.fiche.educations || [];
 
       // Expérience
-      try {
-        this.experienceData = JSON.parse(this.fiche.experience || '[]');
-      } catch (e) {
-        console.warn('❌ Erreur parsing experience :', e);
-        this.experienceData = [];
-      }
+      this.experienceData = this.fiche.experiences || [];
 
       // Coordonnées
       this.contactData = {
-        email: this.fiche.email || '',
-        phone: this.fiche.phone || '',
-        pays: this.detectPays(this.fiche.address),
-        ville: this.detectVille(this.fiche.address)
+        email: this.fiche.contact?.email || '',
+        phone: this.fiche.contact?.phone || '',
+        pays: this.detectPays(this.fiche.contact?.address),
+        ville: this.detectVille(this.fiche.contact?.address)
       };
 
       // Certifications
-      try {
-        const raw = JSON.parse(this.fiche.certifications || '[]');
-        this.certificationData = this.parseCertifications(raw);
-        console.log("✅ Données certification formatées :", this.certificationData);
-      } catch (e) {
-        console.warn("❌ Erreur parsing certifications", e);
-        this.certificationData = [];
-      }
+      this.certificationData = this.fiche.certifications || [];
     }
   }
 

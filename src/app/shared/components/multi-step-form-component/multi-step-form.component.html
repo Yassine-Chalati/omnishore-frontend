@@ -31,7 +31,7 @@
           <div class="w-100 h-100">
             <ng-container>
               <app-form-personal-info *ngIf="selectedStepIndex === 0" [@stepAnimation] [data]="personalInfo"></app-form-personal-info>
-              <app-form-education *ngIf="selectedStepIndex === 1" [@stepAnimation] [education]="educationData"></app-form-education>
+              <app-form-education *ngIf="selectedStepIndex === 1" [@stepAnimation] [educations]="educationData"></app-form-education>
               <app-form-experience *ngIf="selectedStepIndex === 2" [@stepAnimation] [data]="experienceData"></app-form-experience>
               <app-form-contact *ngIf="selectedStepIndex === 3" [@stepAnimation] [data]="contactData"></app-form-contact>
               <app-form-certification *ngIf="selectedStepIndex === 4" [@stepAnimation] [data]="certificationData"></app-form-certification>
