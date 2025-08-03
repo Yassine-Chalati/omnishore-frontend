@@ -4,13 +4,14 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 // Remove CvService import
 // import { CvService } from '../../../core/services/cv-service';
 import { Subscription } from 'rxjs';
+import { ToastComponent } from '../../../core/components/toast-component/toast-component';
 
 @Component({
   selector: 'app-upload-files-component',
   templateUrl: './upload-files-component.html',
   styleUrl: './upload-files-component.css',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass],
+  imports: [NgIf, NgFor, NgClass, ToastComponent],
   animations: [
     trigger('modalAnim', [
       transition('void => enter', [
@@ -137,7 +138,7 @@ export class UploadFilesComponent {
       droppedOutside = !modal.contains(event.target as Node);
     }
     if (droppedOutside && event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-      this.handleFiles(event.dataTransfer.files);
+      this.handleFiles(Array.from(event.dataTransfer.files));
       // Debug: log file drop
       console.log('Dropped files outside modal.');
     }
@@ -145,17 +146,33 @@ export class UploadFilesComponent {
   }
 
   onFileSelected(event: any) {
-    const selectedFiles = event.target.files as FileList;
-    this.handleFiles(selectedFiles);
+    const selectedFiles = Array.from(event.target.files as FileList);
+    if (!this.allowMultiple && selectedFiles.length > 1) {
+      this.showToastMsg('warning', 'Vous ne pouvez sélectionner qu\'un seul fichier.');
+      // Reset files and replace with the first selected file
+      this.files = [];
+      this.fileUploadStates = [];
+      this.fileLoadProgress = [];
+      this.handleFiles([selectedFiles[0]]);
+    } else if (!this.allowMultiple && selectedFiles.length === 1) {
+      // When allowMultiple is false, replace existing files
+      this.files = [];
+      this.fileUploadStates = [];
+      this.fileLoadProgress = [];
+      this.handleFiles(selectedFiles);
+    } else {
+      this.handleFiles(selectedFiles);
+    }
   }
 
-  handleFiles(fileList: FileList) {
+  handleFiles(filesArray: File[]) {
     const maxBytes = this.maxFileSizeMb * 1024 * 1024;
     let filesToAdd: File[] = [];
     let statesToAdd: Array<'idle' | 'ready' | 'uploading' | 'success' | 'error'> = [];
     let progressToAdd: number[] = [];
-    for (let i = 0; i < fileList.length; i++) {
-      const file = fileList[i];
+    let limit = this.allowMultiple ? filesArray.length : Math.min(filesArray.length, 1);
+    for (let i = 0; i < limit; i++) {
+      const file = filesArray[i];
       if (file.size > maxBytes) {
         this.showToastMsg('error', `Le fichier ${file.name} dépasse la taille maximale de ${this.maxFileSizeMb} Mo.`);
         continue;
@@ -205,7 +222,23 @@ export class UploadFilesComponent {
     event.preventDefault();
     this.dragOver = false;
     if (event.dataTransfer?.files) {
-      this.handleFiles(event.dataTransfer.files);
+        const droppedFiles = Array.from(event.dataTransfer.files);
+        if (!this.allowMultiple && droppedFiles.length > 1) {
+            this.showToastMsg('warning', 'Vous ne pouvez glisser qu\'un seul fichier.');
+            // Reset files and replace with the first dropped file
+            this.files = [];
+            this.fileUploadStates = [];
+            this.fileLoadProgress = [];
+            this.handleFiles([droppedFiles[0]]);
+        } else if (!this.allowMultiple && droppedFiles.length === 1) {
+            // When allowMultiple is false, replace existing files
+            this.files = [];
+            this.fileUploadStates = [];
+            this.fileLoadProgress = [];
+            this.handleFiles(droppedFiles);
+        } else {
+            this.handleFiles(droppedFiles);
+        }
     }
   }
 

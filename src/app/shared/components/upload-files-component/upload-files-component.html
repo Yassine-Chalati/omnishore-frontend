@@ -60,3 +60,14 @@
     </button>
   </div>
 </div>
+
+<!-- Toast Messages using the core toast component -->
+<div class="position-fixed bottom-0 start-0" style="z-index: 1070; margin: 1rem;">
+  <app-toast-component 
+    *ngFor="let toast of toasts" 
+    [color]="toast.color" 
+    [message]="toast.message"
+    [duration]="2500"
+    class="mb-2 d-block">
+  </app-toast-component>
+</div>

@@ -35,9 +35,13 @@ export class ToastComponent implements OnInit, OnDestroy {
    */
   @Input() message = '';
 
+  /**
+   * Toast duration in milliseconds
+   */
+  @Input() duration: number = 2500;
+
   progress = 100;
   private timer: any;
-  private duration = 2500;
 
   ngOnInit() {
     this.progress = 100;

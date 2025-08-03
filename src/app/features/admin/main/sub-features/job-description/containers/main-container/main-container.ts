@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastComponent } from "../../../../../../../core/components/toast-component/toast-component";
 import { PrimaryButtonComponent } from "../../../../../../../shared/components/primary-button-component/primary-button-component";
 import { UploadFilesComponent } from "../../../../../../../shared/components/upload-files-component/upload-files-component";
@@ -55,6 +55,7 @@ import { jsPDF } from 'jspdf';
   ]
 })
 export class MainContainer implements OnInit {
+  @ViewChild('uploadFilesComp') uploadFilesComponent!: UploadFilesComponent;
   showUploadModal = false;
   showPromptModal = false;
   showShowPromptModal = false;
@@ -69,7 +70,7 @@ export class MainContainer implements OnInit {
   loading = false;
   promptLoading = false;
 
-  toasts: Array<{ id: number; color: string; message: string }> = [];
+  toasts: Array<{ id: number; color: string; message: string; duration?: number }> = [];
   toastIdCounter = 0;
 
   filePopUpUrl: string | null = null;
@@ -108,9 +109,12 @@ export class MainContainer implements OnInit {
     this.fetchJobDescriptionFiles(page - 1);
   }
 
-  private showToast(color: string, message: string) {
+  private showToast(color: string, message: string, timeout: number = 2500) {
     const id = ++this.toastIdCounter;
-    this.toasts.push({ id, color, message });
+    this.toasts.push({ id, color, message, duration: timeout });
+    setTimeout(() => {
+      this.onToastDone(id);
+    }, timeout);
   }
 
   onToastDone(id: number) {
@@ -119,6 +123,11 @@ export class MainContainer implements OnInit {
 
   openUploadModal() {
     this.showUploadModal = true;
+    setTimeout(() => {
+      if (this.uploadFilesComponent && this.uploadFilesComponent.resetFiles) {
+        this.uploadFilesComponent.resetFiles();
+      }
+    });
   }
 
   openPromptModal() {
@@ -146,7 +155,7 @@ export class MainContainer implements OnInit {
       next: (res) => {
         this.showToast('success', 'Prompt envoyé avec succès!');
         this.closePromptModal();
-        this.fetchJobDescriptionFiles(this.currentPage);
+        this.fetchJobDescriptionFiles(0);
       },
       error: () => {
         this.showToast('red', 'Erreur lors de l\'envoi du prompt.');
@@ -224,5 +233,29 @@ export class MainContainer implements OnInit {
     this.filePopUpType = '';
     this.filePopUpName = '';
     this.filePopUpBytes = null;
+  }
+
+  onFileUpload(event: { file: File; index: number }) {
+    const { file, index } = event;
+    this.jobDescriptionService.uploadJobDescriptionFile(file).subscribe({
+      next: (res) => {
+        this.uploadFilesComponent.updateFileUploadState(index, 'success');
+        this.showToast('success', 'Fichier téléchargé et vérifié !');
+        this.closeUploadModal();
+        this.fetchJobDescriptionFiles(0);
+      },
+      error: () => {
+        this.uploadFilesComponent.updateFileUploadState(index, 'error');
+        this.showToast('red', 'Erreur lors du téléchargement du fichier.');
+      }
+    });
+  }
+
+  onUploadCancelled() {
+    this.showToast('warning', "La procédure de téléchargement est toujours en cours sur le serveur backend et n'est pas annulée, malgré le fait que le processus de téléchargement soit fermé.",  15000);
+  } 
+
+  onNoFilesReady() {
+    this.showToast('warning', 'Aucun fichier prêt à être envoyé.');
   }
 }

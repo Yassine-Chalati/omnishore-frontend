@@ -34,4 +34,11 @@ export class JobDescriptionService {
     const url = environment.backendUrl + '/api/job-description/upload/prompt';
     return this.http.post(url, prompt, { responseType: 'json' });
   }
+
+  uploadJobDescriptionFile(file: File): Observable<any> {
+    const url = environment.backendUrl + '/api/job-description/upload/file';
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(url, formData);
+  }
 }

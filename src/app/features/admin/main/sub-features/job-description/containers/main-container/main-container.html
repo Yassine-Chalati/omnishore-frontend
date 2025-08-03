@@ -4,6 +4,7 @@
       [color]="toast.color"
       [message]="toast.message"
       (animationDone)="onToastDone(toast.id)"
+      [duration]="toast.duration ?? 2500"
     ></app-toast-component>
   </ng-container>
 </div>
@@ -15,7 +16,7 @@
       <ng-container *ngIf="showUploadModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-upload-files-component [allowMultiple]="false" (closed)="closeUploadModal()"></app-upload-files-component>
+          <app-upload-files-component #uploadFilesComp [allowMultiple]="false" (closed)="closeUploadModal()" (fileUpload)="onFileUpload($event)" (uploadCancelled)="onUploadCancelled()" (noFilesReady)="onNoFilesReady()"></app-upload-files-component>
         </div>
       </ng-container>
       <ng-container *ngIf="showPromptModal">
