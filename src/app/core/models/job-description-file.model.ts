@@ -6,5 +6,5 @@ export interface JobDescriptionFile {
   fileName: string;
   addedDate: string; // or `Date` if you convert it
   content: string;
-  type: JobDescriptionFileType;
+  type: JobDescriptionFileType; // Updated fileType to type
 }

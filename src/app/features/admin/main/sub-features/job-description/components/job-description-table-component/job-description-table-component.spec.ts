@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CvTableComponent } from './job-description-table-component';
+import { JobDescriptionTableComponent } from './job-description-table-component';
 
-describe('CvTableComponent', () => {
-  let component: CvTableComponent;
-  let fixture: ComponentFixture<CvTableComponent>;
+describe('JobDescriptionTableComponent', () => {
+  let component: JobDescriptionTableComponent;
+  let fixture: ComponentFixture<JobDescriptionTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CvTableComponent]
+      imports: [JobDescriptionTableComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CvTableComponent);
+    fixture = TestBed.createComponent(JobDescriptionTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

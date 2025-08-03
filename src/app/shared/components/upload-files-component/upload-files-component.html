@@ -1,20 +1,7 @@
 <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
   <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1;"></div>
   <div class="modal-content p-4 rounded-4 shadow-lg border-0" style="max-width: 480px; margin: auto; z-index:2; background: #fff; color: #2d2346; box-shadow: 0 8px 32px 0 rgba(44,36,92,0.12);" [@modalAnim]="modalState">
-    <div
-      class="toast-stack"
-      [ngClass]="{
-        'toast-stack-bottom-left': toastPosition === 'bottom-left',
-        'toast-stack-bottom-right': toastPosition === 'bottom-right',
-        'toast-stack-top-left': toastPosition === 'top-left',
-        'toast-stack-top-right': toastPosition === 'top-right'
-      }"
-      style="position: fixed; z-index: 4000; pointer-events: none; width: 360px; max-width: 96vw;"
-    >
-      <ng-container *ngFor="let toast of toasts">
-        <app-toast-component [color]="toast.color" [message]="toast.message" style="pointer-events: auto;"></app-toast-component>
-      </ng-container>
-    </div>
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="text-center fw-bold m-0 w-100" style="color: #30245c;">Télécharger</h3>
       <button class="btn btn-sm position-absolute top-0 end-0 close-zoom-btn" style="font-size:1.4rem; color:#30245c; background:transparent; border:none; box-shadow:none; transition: color 0.2s, transform 0.2s; margin: 1rem 1.2rem 0 0; padding: 0.3rem 0.7rem;" (click)="closeModal()" title="Fermer">

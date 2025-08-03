@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../configurations/environment';
 import { CvFilePage } from '../models/cv-file-page.model';
 import { CvStructured } from '../models/cv-structured.model';
+import { JobDescriptionFile } from '../models/job-description-file.model';
+import { JobDescriptionFilePage } from '../models/job-description-file-page.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,7 @@ export class CvService {
     const url = `${environment.backendUrl}/api/cv/${id}`;
     return this.http.get<CvStructured>(url);
   }
-  getCvFiles(page = 0, size = 5, sort = 'addedDate,desc'): Observable<CvFilePage> {
+  getCvFiles(page = 0, size = 5, sort = 'id,desc'): Observable<CvFilePage> {
     const params = new HttpParams()
       .set('page', page)
       .set('size', size)

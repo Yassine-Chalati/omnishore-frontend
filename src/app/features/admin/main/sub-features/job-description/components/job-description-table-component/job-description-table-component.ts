@@ -29,10 +29,10 @@ import { Router } from '@angular/router';
     ])
   ]
 })
-export class CvTableComponent {
+export class JobDescriptionTableComponent {
   currentPage = 1;
   itemsPerPage = 7;
-  @Output() filePopUpClicked = new EventEmitter<void>();
+  @Output() filePopUpClicked = new EventEmitter<JobDescriptionFile>();
 
   constructor(private router: Router) {}
 
@@ -56,7 +56,7 @@ export class CvTableComponent {
     this.currentPage = page;
   }
 
-  onShowFilePopUpClicked() {
-    this.filePopUpClicked.emit();
+  onShowFilePopUpClicked(jobFile: JobDescriptionFile) {
+    this.filePopUpClicked.emit(jobFile);
   }
 }

@@ -1,0 +1,61 @@
+/* Responsive modal for all screens */
+.prompt-modal {
+  max-width: 700px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 1rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .prompt-modal {
+    max-width: 95vw;
+    padding: 1.5rem 1rem;
+  }
+  .prompt-modal h2 {
+    font-size: 1.6rem;
+  }
+  .prompt-modal textarea {
+    font-size: 1.1rem;
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 600px) {
+  .prompt-modal {
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0.7rem;
+    padding: 1rem 0.5rem;
+  }
+  .prompt-modal h2 {
+    font-size: 1.2rem;
+  }
+  .prompt-modal textarea {
+    font-size: 1rem;
+    min-height: 80px;
+  }
+}
+/* Primary button hover color for prompt */
+app-primary-button-component .btn:hover,
+app-primary-button-component:hover .btn {
+  background-color: #e75480 !important;
+  border-color: #e75480 !important;
+}
+/* Close button style and animation */
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #30245c;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+}
+.close-btn:hover {
+  transform: scale(1.2);
+  color: #e75480;
+}
+/* Style textarea border always #30245c */
+.prompt-modal textarea {
+  border: 2px solid #30245c;
+}

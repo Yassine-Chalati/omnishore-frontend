@@ -12,7 +12,7 @@
       <tr *ngFor="let jobDescriptionFile of paginatedJobDescriptionFileList">
         <td class="text-center">{{ jobDescriptionFile.addedDate }}</td>
         <td class="text-center">
-          <a class="cursor-pointer" (click)="onShowFilePopUpClicked()">
+          <a class="cursor-pointer" (click)="onShowFilePopUpClicked(jobDescriptionFile)">
             {{ jobDescriptionFile.fileName }}
           </a>
         </td>

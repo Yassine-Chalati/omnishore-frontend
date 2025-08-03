@@ -1,7 +1,6 @@
 import { Component, HostListener, Output, EventEmitter, Input } from '@angular/core';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
-import { ToastComponent } from '../../../core/components/toast-component/toast-component';
 // Remove CvService import
 // import { CvService } from '../../../core/services/cv-service';
 import { Subscription } from 'rxjs';
@@ -11,7 +10,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './upload-files-component.html',
   styleUrl: './upload-files-component.css',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, ToastComponent],
+  imports: [NgIf, NgFor, NgClass],
   animations: [
     trigger('modalAnim', [
       transition('void => enter', [

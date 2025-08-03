@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ToastComponent } from "../../../../../../../core/components/toast-component/toast-component";
 import { PrimaryButtonComponent } from "../../../../../../../shared/components/primary-button-component/primary-button-component";
 import { UploadFilesComponent } from "../../../../../../../shared/components/upload-files-component/upload-files-component";
 import { trigger, state, style, animate, transition, keyframes } from '@angular/animations';
-import { NgIf } from '@angular/common';
-import { CvTableComponent } from "../../components/job-description-table-component/job-description-table-component";
+import { NgIf, NgFor } from '@angular/common';
+import { JobDescriptionTableComponent } from "../../components/job-description-table-component/job-description-table-component";
 import { JobDescriptionFile } from '../../../../../../../core/models/job-description-file.model';
 import { PromptComponent } from "../../components/prompt-component/prompt-component";
 import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
+import { JobDescriptionService } from '../../../../../../../core/services/job-description-service';
+import { LoaderComponent } from '../../../../../../../shared/components/loader-component/loader-component';
+import { ShowPromptComponent } from '../../components/show-prompt-component/show-prompt-component';
 
 @Component({
   selector: 'app-main-container',
-  imports: [ToastComponent, PrimaryButtonComponent, UploadFilesComponent, NgIf, CvTableComponent, PromptComponent, FilePopUpComponent],
+  imports: [ToastComponent, PrimaryButtonComponent, UploadFilesComponent, NgIf, NgFor, JobDescriptionTableComponent, PromptComponent, FilePopUpComponent, LoaderComponent, ShowPromptComponent],
   templateUrl: './main-container.html',
   styleUrl: './main-container.css',
   standalone: true,
@@ -50,10 +53,56 @@ import { FilePopUpComponent } from "../../../../../../../shared/components/file-
     ])
   ]
 })
-export class MainContainer {
+export class MainContainer implements OnInit {
   showUploadModal = false;
   showPromptModal = false;
+  showShowPromptModal = false; // Added flag for ShowPromptComponent
   showFilePopUpModal = false;
+
+  jobDescriptionsFileList: JobDescriptionFile[] = [];
+  totalPages = 1;
+  totalElements = 0;
+  pageSize = 5;
+  currentPage = 0;
+  loading = false;
+
+  toasts: Array<{ id: number; color: string; message: string }> = [];
+  toastIdCounter = 0;
+
+  constructor(private jobDescriptionService: JobDescriptionService) {}
+
+  ngOnInit() {
+    this.fetchJobDescriptionFiles();
+  }
+
+  fetchJobDescriptionFiles(page: number = 0) {
+    this.loading = true;
+    this.jobDescriptionService.getJobDescriptionFiles(page, this.pageSize, 'id,desc').subscribe({
+      next: (res) => {
+        this.jobDescriptionsFileList = res.content;
+        this.totalPages = res.totalPages;
+        this.totalElements = res.totalElements;
+        this.currentPage = res.number;
+        this.pageSize = res.size;
+        this.showToast('success', 'Fiches de poste chargées avec succès!');
+      },
+      error: () => {
+        this.showToast('red', 'Erreur lors du chargement des fiches de poste.');
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  private showToast(color: string, message: string) {
+    const id = ++this.toastIdCounter;
+    this.toasts.push({ id, color, message });
+  }
+
+  onToastDone(id: number) {
+    this.toasts = this.toasts.filter(t => t.id !== id);
+  }
 
   openUploadModal() {
     this.showUploadModal = true;
@@ -61,6 +110,10 @@ export class MainContainer {
 
   openPromptModal() {
     this.showPromptModal = true;
+  }
+
+  openShowPromptModal() {
+    this.showShowPromptModal = true;
   }
 
   closeUploadModal() {
@@ -71,23 +124,19 @@ export class MainContainer {
     this.showPromptModal = false;
   }
 
-  openFilePopUpModal() {
-    this.showFilePopUpModal = true;
+  closeShowPromptModal() {
+    this.showShowPromptModal = false;
+  }
+
+  openFilePopUpModal(jobFile: JobDescriptionFile) {
+    if (jobFile.type === 'PDF') {
+      this.showFilePopUpModal = true;
+    } else {
+      this.openShowPromptModal();
+    }
   }
   
   closeFilePopUpModal() {
     this.showFilePopUpModal = false;
   }
-
-// static data -------------------
-  jobDescriptionsFileList: JobDescriptionFile[] = [
-    ...Array.from({ length: 100 }, (_, i) => ({
-      id: i + 1,
-      fileName: `fiche_poste_test${i + 1}`,
-      addedDate: `2025-07-${(21 - (i % 30)).toString().padStart(2, '0')}`,
-      content: '',
-      type: (['PDF','PROMPT'][i%2] as JobDescriptionFile['type'])
-    }))
-  ];
-// ----------------------------
 }

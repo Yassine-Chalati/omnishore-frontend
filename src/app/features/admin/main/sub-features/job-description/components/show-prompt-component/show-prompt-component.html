@@ -1,0 +1,10 @@
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050; min-height:100vh;">
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background:rgba(44,36,92,0.18);backdrop-filter:blur(2px);z-index:1; min-height:100vh;"></div>
+  <div *ngIf="showModal" class="prompt-modal position-relative p-2 p-sm-3 p-md-4 rounded shadow-lg bg-white w-100 mx-2 mx-sm-3 mx-md-0 overflow-auto" style="z-index:2; border: 2px solid #30245c; max-width:700px; width:100%; min-width:0; max-height:90vh;" [@zoomIn]>
+    <button class="close-btn position-absolute top-0 end-0 m-3" (click)="closeModal()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h2 class="mb-3 fw-bold" style="color:#30245c; font-size:2.2rem;">Prompt</h2>
+    <textarea disabled class="form-control mb-3 w-100" rows="6" style="resize:none; min-height:120px; font-size:1.3rem;" [(ngModel)]="promptText" placeholder=""></textarea>
+  </div>
+</div>
