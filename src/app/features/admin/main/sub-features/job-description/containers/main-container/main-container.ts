@@ -11,6 +11,7 @@ import { FilePopUpComponent } from "../../../../../../../shared/components/file-
 import { JobDescriptionService } from '../../../../../../../core/services/job-description-service';
 import { LoaderComponent } from '../../../../../../../shared/components/loader-component/loader-component';
 import { ShowPromptComponent } from '../../components/show-prompt-component/show-prompt-component';
+import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-main-container',
@@ -56,8 +57,9 @@ import { ShowPromptComponent } from '../../components/show-prompt-component/show
 export class MainContainer implements OnInit {
   showUploadModal = false;
   showPromptModal = false;
-  showShowPromptModal = false; // Added flag for ShowPromptComponent
+  showShowPromptModal = false;
   showFilePopUpModal = false;
+  showPromptContent: string = '';
 
   jobDescriptionsFileList: JobDescriptionFile[] = [];
   totalPages = 1;
@@ -65,9 +67,16 @@ export class MainContainer implements OnInit {
   pageSize = 5;
   currentPage = 0;
   loading = false;
+  promptLoading = false;
 
   toasts: Array<{ id: number; color: string; message: string }> = [];
   toastIdCounter = 0;
+
+  filePopUpUrl: string | null = null;
+  filePopUpType: string = '';
+  filePopUpName: string = '';
+  filePopUpBytes: ArrayBuffer | null = null;
+  filePopUpLoading: boolean = false;
 
   constructor(private jobDescriptionService: JobDescriptionService) {}
 
@@ -95,6 +104,10 @@ export class MainContainer implements OnInit {
     });
   }
 
+  onTablePageChange(page: number) {
+    this.fetchJobDescriptionFiles(page - 1);
+  }
+
   private showToast(color: string, message: string) {
     const id = ++this.toastIdCounter;
     this.toasts.push({ id, color, message });
@@ -112,7 +125,10 @@ export class MainContainer implements OnInit {
     this.showPromptModal = true;
   }
 
-  openShowPromptModal() {
+  openShowPromptModal(content?: string) {
+    if (content) {
+      this.showPromptContent = content;
+    }
     this.showShowPromptModal = true;
   }
 
@@ -124,19 +140,89 @@ export class MainContainer implements OnInit {
     this.showPromptModal = false;
   }
 
-  closeShowPromptModal() {
-    this.showShowPromptModal = false;
+  handlePromptSent(promptText: string) {
+    this.promptLoading = true;
+    this.jobDescriptionService.uploadPrompt(promptText).subscribe({
+      next: (res) => {
+        this.showToast('success', 'Prompt envoyé avec succès!');
+        this.closePromptModal();
+        this.fetchJobDescriptionFiles(this.currentPage);
+      },
+      error: () => {
+        this.showToast('red', 'Erreur lors de l\'envoi du prompt.');
+      },
+      complete: () => {
+        this.promptLoading = false;
+      }
+    });
   }
 
-  openFilePopUpModal(jobFile: JobDescriptionFile) {
-    if (jobFile.type === 'PDF') {
-      this.showFilePopUpModal = true;
-    } else {
-      this.openShowPromptModal();
-    }
+  closeShowPromptModal() {
+    this.showShowPromptModal = false;
+    this.showPromptContent = '';
   }
-  
+
+  openFilePopUpModal(jobFile?: JobDescriptionFile) {
+    if (!jobFile) return;
+    if (jobFile.type === 'PROMPT') {
+      if (jobFile.content && jobFile.content.trim() !== '') {
+        this.openShowPromptModal(jobFile.content);
+        this.showToast('success', 'Prompt chargé avec succès.');
+      } else {
+        this.showToast('red', "Le contenu du prompt n'est pas disponible.");
+      }
+      return;
+    }
+    
+    this.filePopUpLoading = true;
+    this.filePopUpUrl = null;
+    this.filePopUpType = '';
+    this.filePopUpName = '';
+    this.filePopUpBytes = null;
+    this.showFilePopUpModal = true;
+    
+    this.jobDescriptionService.downloadFileAsBlob(jobFile.fileName).subscribe({
+      next: (blob) => {
+        this.showToast('success', 'Fichier chargé avec succès.');
+        if (this.filePopUpUrl) {
+          URL.revokeObjectURL(this.filePopUpUrl);
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.filePopUpUrl = reader.result as string;
+          this.filePopUpUrl = this.filePopUpUrl.replace('data:application/octet-stream', 'data:application/pdf');
+          this.filePopUpLoading = false;
+        };
+        reader.readAsDataURL(blob);
+
+        // Convert Blob to ArrayBuffer
+        const arrayBufferReader = new FileReader();
+        arrayBufferReader.onload = () => {
+          this.filePopUpBytes = arrayBufferReader.result as ArrayBuffer;
+        };
+        arrayBufferReader.readAsArrayBuffer(blob);
+
+        this.filePopUpType = 'application/pdf';
+        this.filePopUpName = jobFile.fileName.endsWith('.pdf') ? jobFile.fileName : `${jobFile.fileName}.pdf`;
+      },
+      error: (err) => {
+        console.error('Error loading file:', err);
+        this.showToast('red', 'Erreur lors du chargement du fichier.');
+        this.filePopUpLoading = false;
+        this.showFilePopUpModal = false;
+      }
+    });
+  }
+
   closeFilePopUpModal() {
     this.showFilePopUpModal = false;
+    this.filePopUpLoading = false;
+    if (this.filePopUpUrl) {
+      URL.revokeObjectURL(this.filePopUpUrl);
+      this.filePopUpUrl = null;
+    }
+    this.filePopUpType = '';
+    this.filePopUpName = '';
+    this.filePopUpBytes = null;
   }
 }

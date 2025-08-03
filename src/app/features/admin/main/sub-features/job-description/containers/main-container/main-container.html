@@ -21,23 +21,44 @@
       <ng-container *ngIf="showPromptModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-prompt-component (closed)="closePromptModal()"></app-prompt-component>
+          <ng-container *ngIf="promptLoading">
+            <app-loader-component [loaderMessage]="'Envoi du prompt...'" ></app-loader-component>
+          </ng-container>
+          <ng-container *ngIf="!promptLoading">
+            <app-prompt-component (closed)="closePromptModal()" (promptSent)="handlePromptSent($event)"></app-prompt-component>
+          </ng-container>
         </div>
       </ng-container>
       <ng-container *ngIf="showShowPromptModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-show-prompt-component (closed)="closeShowPromptModal()"></app-show-prompt-component>
+          <app-show-prompt-component [promptText]="showPromptContent" (closed)="closeShowPromptModal()"></app-show-prompt-component>
         </div>
       </ng-container>
       <ng-container *ngIf="showFilePopUpModal">
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
         <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1050;">
-          <app-file-pop-up-component></app-file-pop-up-component>
+          <ng-container *ngIf="filePopUpLoading">
+            <app-loader-component [loaderMessage]="'Chargement du fichier...'" ></app-loader-component>
+          </ng-container>
+          <ng-container *ngIf="!filePopUpLoading && filePopUpUrl">
+            <app-file-pop-up-component
+              [fileUrl]="filePopUpUrl"
+              [fileType]="filePopUpType"
+              [fileName]="filePopUpName"
+              [fileBytes]="filePopUpBytes"
+              (closed)="closeFilePopUpModal()"
+            ></app-file-pop-up-component>
+          </ng-container>
         </div>
       </ng-container>
     </div>
-    <app-job-description-table-component [jobDescriptionFileList]="jobDescriptionsFileList" (filePopUpClicked)="openFilePopUpModal($event)"></app-job-description-table-component>
+    <app-job-description-table-component 
+      [jobDescriptionFileList]="jobDescriptionsFileList"
+      [currentPage]="currentPage + 1"
+      [totalPages]="totalPages"
+      (pageChange)="onTablePageChange($event)"
+      (filePopUpClicked)="openFilePopUpModal($event)"></app-job-description-table-component>
     <ng-container *ngIf="loading">
       <app-loader-component [loaderMessage]="'Chargement des fiches de poste...'"></app-loader-component>
     </ng-container>

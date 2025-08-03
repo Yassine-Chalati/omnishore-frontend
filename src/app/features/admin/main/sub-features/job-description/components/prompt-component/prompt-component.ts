@@ -23,6 +23,7 @@ import { PrimaryButtonComponent } from "../../../../../../../shared/components/p
 })
 export class PromptComponent {
   @Output() closed = new EventEmitter<void>();
+  @Output() promptSent = new EventEmitter<string>();
   promptText: string = '';
   sentPrompts: string[] = [];
   showModal: boolean = true;
@@ -38,6 +39,7 @@ export class PromptComponent {
     const text = this.promptText?.trim();
     if (text) {
       this.sentPrompts.push(text);
+      this.promptSent.emit(text);
       this.promptText = '';
     }
   }

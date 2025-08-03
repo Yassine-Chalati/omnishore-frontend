@@ -21,8 +21,8 @@ import { FormsModule } from '@angular/forms';
   ]
 })
 export class ShowPromptComponent {
+  @Input() promptText: string = '';
   @Output() closed = new EventEmitter<void>();
-  promptText: string = '';
   sentPrompts: string[] = [];
   showModal: boolean = true;
 

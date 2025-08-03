@@ -30,30 +30,67 @@ import { Router } from '@angular/router';
   ]
 })
 export class JobDescriptionTableComponent {
-  currentPage = 1;
-  itemsPerPage = 7;
+  @Input() jobDescriptionFileList: JobDescriptionFile[] = [];
+  @Input() currentPage: number = 1;
+  @Input() totalPages: number = 1;
+  @Output() pageChange = new EventEmitter<number>();
   @Output() filePopUpClicked = new EventEmitter<JobDescriptionFile>();
 
   constructor(private router: Router) {}
-
-  @Input() jobDescriptionFileList: JobDescriptionFile[] = [];
 
   showMatchingList(id:number) {
     this.router.navigate(['/admin/matching', id]);
   }
 
-  get totalPages() {
-    return Math.ceil(this.jobDescriptionFileList.length / this.itemsPerPage);
+  goToPage(page: number) {
+    if (page < 0 || page >= this.totalPages) return;
+    this.pageChange.emit(page + 1); // Convert to 1-based for backend
   }
 
   get paginatedJobDescriptionFileList() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    return this.jobDescriptionFileList.slice(start, start + this.itemsPerPage);
+    // No local pagination, just return the list
+    return this.jobDescriptionFileList;
   }
 
-  goToPage(page: number) {
-    if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
+  getVisiblePages(): number[] {
+    const visiblePages: number[] = [];
+    
+    if (this.totalPages <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 0; i < this.totalPages; i++) {
+        visiblePages.push(i);
+      }
+    } else {
+      // For more than 7 pages, show middle pages around current page
+      let start: number;
+      let end: number;
+      
+      if (this.currentPage <= 3) {
+        // Show pages 2, 3, 4, 5 when current page is 0, 1, 2, or 3
+        start = 1;
+        end = 5;
+      } else if (this.currentPage >= this.totalPages - 4) {
+        // Show last 4 middle pages when near the end
+        start = this.totalPages - 5;
+        end = this.totalPages - 1;
+      } else {
+        // Show 2 pages before and after current page
+        start = this.currentPage - 2;
+        end = this.currentPage + 2;
+      }
+      
+      for (let i = start; i <= end && i < this.totalPages - 1; i++) {
+        if (i > 0) {
+          visiblePages.push(i);
+        }
+      }
+    }
+    
+    return visiblePages;
+  }
+
+  trackByFn(index: number, page: number): number {
+    return page;
   }
 
   onShowFilePopUpClicked(jobFile: JobDescriptionFile) {

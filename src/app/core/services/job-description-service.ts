@@ -10,6 +10,7 @@ import { JobDescriptionFilePage } from '../models/job-description-file-page.mode
 })
 export class JobDescriptionService {
   private jobDescriptionUrl = environment.backendUrl + '/api/job-description/all';
+  private downloadBaseUrl = environment.backendUrl + '/api/job-description/download';
   
   constructor(private http: HttpClient) {}
 
@@ -19,5 +20,18 @@ export class JobDescriptionService {
       .set('size', size)
       .set('sort', sort);
     return this.http.get<JobDescriptionFilePage>(this.jobDescriptionUrl, { params });
+  }
+
+  getDownloadUrl(fileName: string): string {
+    return `${this.downloadBaseUrl}/${fileName}`;
+  }
+
+  downloadFileAsBlob(fileName: string): Observable<Blob> {
+    return this.http.get(this.getDownloadUrl(fileName), { responseType: 'blob' });
+  }
+  
+  uploadPrompt(prompt: string): Observable<any> {
+    const url = environment.backendUrl + '/api/job-description/upload/prompt';
+    return this.http.post(url, prompt, { responseType: 'json' });
   }
 }

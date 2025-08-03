@@ -29,41 +29,57 @@
   </table>
 </div>
     <!-- Pagination -->
-    <nav aria-label="CVs pagination">
+    <nav aria-label="Job Description pagination">
       <ul class="pagination justify-content-center">
+        <!-- Previous Button -->
         <li class="page-item" [class.disabled]="currentPage === 1">
-          <a class="page-link" href="#" (click)="goToPage(currentPage - 1); $event.preventDefault();">Previous</a>
+          <a class="page-link" href="#" (click)="currentPage > 1 ? goToPage(currentPage - 2) : null; $event.preventDefault();">Previous</a>
         </li>
-        <ng-container *ngIf="totalPages <= 2">
+
+        <!-- Pages Logic -->
+        <!-- Adjusted Pagination Logic for Backend Indexing -->
+        <ng-container *ngIf="totalPages <= 7">
           <li
             class="page-item"
             *ngFor="let page of [].constructor(totalPages); let i = index"
             [class.active]="currentPage === i + 1"
           >
-            <a class="page-link" href="#" (click)="goToPage(i + 1); $event.preventDefault();">{{ i + 1 }}</a>
+            <a class="page-link" href="#" (click)="goToPage(i); $event.preventDefault();">{{ i + 1 }}</a>
           </li>
         </ng-container>
-        <ng-container *ngIf="totalPages > 10">
+
+        <ng-container *ngIf="totalPages > 7">
+          <!-- First Page -->
           <li class="page-item" [class.active]="currentPage === 1">
-            <a class="page-link" href="#" (click)="goToPage(1); $event.preventDefault();">1</a>
+            <a class="page-link" href="#" (click)="goToPage(0); $event.preventDefault();">1</a>
           </li>
-          <li class="page-item" *ngIf="currentPage > 5"><span class="page-link">...</span></li>
-          <ng-container *ngFor="let page of [].constructor(totalPages - 2); let i = index">
-            <li
-              class="page-item"
-              *ngIf="i + 2 >= currentPage - 2 && i + 2 <= currentPage + 2"
-              [class.active]="currentPage === i + 2"
-            >
-              <a class="page-link" href="#" (click)="goToPage(i + 2); $event.preventDefault();">{{ i + 2 }}</a>
+
+          <!-- Ellipsis Before Middle Pages -->
+          <li class="page-item" *ngIf="currentPage > 4">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- Dynamic Middle Pages -->
+          <ng-container *ngFor="let page of getVisiblePages(); trackBy: trackByFn">
+            <li class="page-item" [class.active]="currentPage === page + 1">
+              <a class="page-link" href="#" (click)="goToPage(page); $event.preventDefault();">{{ page + 1 }}</a>
             </li>
           </ng-container>
-          <li class="page-item" *ngIf="currentPage < totalPages - 4"><span class="page-link">...</span></li>
+
+          <!-- Ellipsis After Middle Pages -->
+          <li class="page-item" *ngIf="currentPage < totalPages - 3">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- Last Page -->
           <li class="page-item" [class.active]="currentPage === totalPages">
-            <a class="page-link" href="#" (click)="goToPage(totalPages); $event.preventDefault();">{{ totalPages }}</a>
+            <a class="page-link" href="#" (click)="goToPage(totalPages - 1); $event.preventDefault();">{{ totalPages }}</a>
           </li>
         </ng-container>
+
+        <!-- Next Button -->
         <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <a class="page-link" href="#" (click)="goToPage(currentPage + 1); $event.preventDefault();">Next</a>
+          <a class="page-link" href="#" (click)="goToPage(currentPage); $event.preventDefault();">Next</a>
         </li>
       </ul>
     </nav>
