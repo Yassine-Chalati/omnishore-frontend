@@ -8,6 +8,11 @@ import { FormExperienceComponent } from '../form-experience-component/form-exper
 import { FormContactComponent } from '../form-contact-component/form-contact.component';
 import { FormCertificationComponent } from '../form-certification-component/form-certification.component';
 
+// Import proper models
+import { CvStructured } from '../../../core/models/cv-structured.model';
+import { BaseEntity } from '../../../core/models/base-entity.model';
+import { Contact } from '../../../core/models/contact.model';
+
 import {
   trigger,
   transition,
@@ -62,11 +67,18 @@ import {
   ]
 })
 export class MultiStepFormComponent implements OnChanges {
-  staticEducations: any[] = [];
+  @Input() fiche: CvStructured | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
 
   modalState: 'enter' | 'leave' = 'enter';
+  
+  staticEducations: BaseEntity[] = [];
+  educationData: BaseEntity[] = [];
+  experienceData: string[] = [];
+  certificationData: any[] = [];
+  contactData: any = {};
+  personalInfo: any = {};
 
   onClose() {
     this.modalState = 'leave';
@@ -75,41 +87,6 @@ export class MultiStepFormComponent implements OnChanges {
       this.closed.emit();
     }, 200); // Match animation duration
   }
-
-
-  @Input() fiche: any;
-
-  personalInfo: any = {
-    name: '',
-    profil: '',
-    adresse: '',
-    birthdate: ''
-  };
-
-  educationData: any = {
-    etablissement: '',
-    filiere: '',
-    pays: '',
-    debut: '',
-    fin: '',
-    actuel: false
-  };
-
-  experienceData: string[] = [];
-
-  contactData: any = {
-    email: '',
-    phone: '',
-    pays: '',
-    ville: ''
-  };
-
-  certificationData: {
-    diplome: string;
-    organisation: string;
-    date: string;
-    description: string;
-  }[] = [];
 
   steps = [
     { label: 'Information Personnelle', icon: '👤' },
@@ -122,33 +99,78 @@ export class MultiStepFormComponent implements OnChanges {
   selectedStepIndex = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['fiche'] && this.fiche) {
-      // Information personnelle
-      this.personalInfo = {
-        name: this.fiche.name || '',
-        profil: this.fiche.profil || '',
-        adresse: this.fiche.contact?.address || '',
-        birthdate: this.fiche.birthdate || ''
-      };
+    console.log('Multi-step form ngOnChanges triggered with:', changes);
+    
+    if (changes['fiche']) {
+      const ficheData = this.fiche;
+      console.log('Multi-step form received fiche data:', ficheData);
+      
+      if (ficheData) {
+        // Information personnelle
+        this.personalInfo = {
+          name: ficheData.name || '',
+          profil: ficheData.profil || '',
+          adresse: ficheData.contact?.address || '',
+          birthdate: '' // This field doesn't exist in CvStructured model
+        };
 
-      // Études
-      this.staticEducations = this.fiche.educations || [];
-      this.educationData = this.fiche.educations || [];
+        // Études - using BaseEntity[] directly
+        this.staticEducations = ficheData.educations || [];
+        this.educationData = [...this.staticEducations];
 
-      // Expérience
-      this.experienceData = this.fiche.experiences || [];
+        // Expérience - map BaseEntity[] to string array
+        this.experienceData = ficheData.experiences?.map((exp: BaseEntity) => 
+          exp.value || ''
+        ) || [];
 
-      // Coordonnées
-      this.contactData = {
-        email: this.fiche.contact?.email || '',
-        phone: this.fiche.contact?.phone || '',
-        pays: this.detectPays(this.fiche.contact?.address),
-        ville: this.detectVille(this.fiche.contact?.address)
-      };
+        // Coordonnées
+        this.contactData = {
+          email: ficheData.contact?.email || '',
+          phone: ficheData.contact?.phone || '',
+          pays: this.detectPays(ficheData.contact?.address || ''),
+          ville: this.detectVille(ficheData.contact?.address || '')
+        };
 
-      // Certifications
-      this.certificationData = this.fiche.certifications || [];
+        // Certifications - map BaseEntity[] to expected format
+        this.certificationData = ficheData.certifications?.map((cert: BaseEntity) => ({
+          diplome: cert.value || '',
+          organisation: '',
+          date: '',
+          description: cert.value || ''
+        })) || [];
+
+        console.log('Successfully mapped data:', {
+          personalInfo: this.personalInfo,
+          educationData: this.educationData,
+          experienceData: this.experienceData,
+          contactData: this.contactData,
+          certificationData: this.certificationData
+        });
+      } else {
+        // Initialize with empty data if no fiche provided
+        console.log('No fiche data provided, initializing with empty values');
+        this.initializeEmptyData();
+      }
     }
+  }
+
+  private initializeEmptyData() {
+    this.personalInfo = {
+      name: '',
+      profil: '',
+      adresse: '',
+      birthdate: ''
+    };
+    this.staticEducations = [];
+    this.educationData = [];
+    this.experienceData = [];
+    this.contactData = {
+      email: '',
+      phone: '',
+      pays: '',
+      ville: ''
+    };
+    this.certificationData = [];
   }
 
   selectStep(index: number) {

@@ -56,16 +56,7 @@ export class FormExperienceComponent implements OnChanges, OnInit, AfterViewInit
   }
 
   ngOnInit(): void {
-    this.experiences = [
-      { id: 1, value: "EXPERIENCE PROFESSIONNELLES" },
-      { id: 2, value: "Stagiaire informatique Menara Prefa - Marrakech Analyse des besoins clients." },
-      { id: 3, value: "Analyse de l'existence Conception et programmation d'applications et de solutions logicielles dans le respect du cahier des charges." },
-      { id: 4, value: "Réalisation d'applications web." },
-      { id: 5, value: "Participation aux réunions d'équipe pour discuter des progrès, des défis et des opportunités liées au développement logiciel." },
-      { id: 6, value: "Technologies: Spring Boot." },
-      { id: 7, value: "Angular (TypeScript, HTML et CSS)." },
-      { id: 8, value: "Architecture Monolithique." }
-    ];
+    // No static demo data, use only input data
   }
 
   extractField(text: string, keyword: string): string {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, HostListener } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { ToastComponent } from '../../../../../../../core/components/toast-component/toast-component';
 import { trigger, state, style, animate, transition, keyframes } from '@angular/animations';
@@ -87,6 +87,32 @@ export class MainContainer implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {}
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    console.log('Escape key pressed, closing modals...');
+    
+    // Close any open modal when escape is pressed
+    if (this.showStructuredCvFormModal) {
+      this.closeStructuredCvFormModal();
+      return;
+    }
+    
+    if (this.showFilePopUpModal) {
+      this.closeFilePopUpModal();
+      return;
+    }
+    
+    if (this.showShowPromptModal) {
+      this.closeShowPromptModal();
+      return;
+    }
+    
+    if (this.showUploadModal) {
+      this.showUploadModal = false;
+      return;
+    }
+  }
 
   ngOnInit() {
     this.loading = true;

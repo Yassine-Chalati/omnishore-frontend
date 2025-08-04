@@ -37,6 +37,12 @@ export class StructuredCvFormComponent {
 
   @Input() cvStructured?: import('../../../core/models/cv-structured.model').CvStructured;
 
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    console.log('Escape key pressed in structured CV form, closing modal...');
+    this.closeModal();
+  }
+
   closeModal() {
     this.modalState = 'leave';
   }
