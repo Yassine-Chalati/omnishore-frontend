@@ -33,7 +33,7 @@ export class MatchingTableComponent {
   itemsPerPage = 7;
 
   @Input() matchingList: Matching[] = [];
-  @Output() clickedStructuredCvForm = new EventEmitter<void>();
+  @Output() clickedStructuredCvForm = new EventEmitter<number>(); // Changed to emit CV ID
   @Output() clickedFilePopUp = new EventEmitter<any>();
 
   get totalPages() {
@@ -50,8 +50,9 @@ export class MatchingTableComponent {
     this.currentPage = page;
   }
 
-   onShowStructuredCvFormClicked() {
-    this.clickedStructuredCvForm.emit();
+   onShowStructuredCvFormClicked(cvFileId: number) {
+    console.log('Emitting CV ID for structured form:', cvFileId);
+    this.clickedStructuredCvForm.emit(cvFileId);
   }
 
   onShowFilePopUpClicked(cvFile: any) {

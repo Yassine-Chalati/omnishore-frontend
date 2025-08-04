@@ -22,7 +22,7 @@
         <td class="text-center">
           <div class="d-flex justify-content-center align-items-center">
             <!-- <button class="btn btn-sm btn-primary custom-download-btn">Afficher fichier candidat</button> -->
-            <app-primary-button-component icon="bi bi-file-earmark-text" label="Afficher fiche candidat" (click)="onShowStructuredCvFormClicked()"></app-primary-button-component>
+            <app-primary-button-component icon="bi bi-file-earmark-text" label="Afficher fiche candidat" (click)="onShowStructuredCvFormClicked(matche.cvFile.id)"></app-primary-button-component>
             <!-- <button class="btn btn-sm btn-danger ms-2">Delete</button> -->
           </div>
         </td>

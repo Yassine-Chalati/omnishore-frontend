@@ -5,6 +5,7 @@ import { trigger, state, style, animate, transition, keyframes } from '@angular/
 import { MatchingTableComponent } from '../../components/matching-table-component/matching-table-component';
 import { PrimaryButtonComponent } from '../../../../../../../shared/components/primary-button-component/primary-button-component';
 import { Matching } from '../../../../../../../core/models/matching.model';
+import { CvStructured } from '../../../../../../../core/models/cv-structured.model';
 import { StructuredCvFormComponent } from "../../../../../../../shared/components/structured-cv-from-component/structured-cv-form-component";
 import { FilePopUpComponent } from "../../../../../../../shared/components/file-pop-up-component/file-pop-up-component";
 import { ActivatedRoute, Router } from '@angular/router';
@@ -64,6 +65,7 @@ export class MainContainer implements OnInit {
   showFilePopUpModal = false;
 
   matchingList: Matching[] = [];
+  cvStructured: CvStructured | null = null;
   loading = false;
   jobDescriptionId: number | null = null;
   
@@ -335,12 +337,32 @@ export class MainContainer implements OnInit {
     this.filePopUpBytes = null;
   }
 
-  openStructuredCvFormModal() {
-    this.showStructuredCvFormModal = true;
+  openStructuredCvFormModal(cvFileId: number) {
+    console.log('Opening structured CV modal for CV ID:', cvFileId);
+    
+    this.cvService.getStructuredCv(cvFileId).subscribe({
+      next: (data) => {
+        this.cvStructured = data;
+        console.log('Structured CV loaded:', this.cvStructured);
+        this.showStructuredCvFormModal = true;
+        this.showToast('success', `CV structuré du candidat #${cvFileId} chargé avec succès!`);
+      },
+      error: (err) => {
+        console.error('Error loading structured CV:', err);
+        this.showToast('error', `Erreur lors du chargement du CV structuré du candidat #${cvFileId}.`);
+      }
+    });
   }
 
   closeStructuredCvFormModal() {
     this.showStructuredCvFormModal = false;
+    this.cvStructured = null; // Clear the data when closing
+    setTimeout(() => {
+      const modalBackdrop = document.querySelector('.modal-backdrop');
+      if (modalBackdrop) {
+        modalBackdrop.remove();
+      }
+    }, 100);
   }
 
 
