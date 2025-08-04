@@ -1,1 +1,15 @@
-<app-main-container class="d-flex flex-column flex-grow-1"></app-main-container>
+<div *ngIf="dataAvailable; else noData" class="d-flex flex-column flex-grow-1">
+  <app-main-container [jobDescriptionData]="jobDescriptionData" class="d-flex flex-column flex-grow-1"></app-main-container>
+</div>
+
+<ng-template #noData>
+  <div class="d-flex justify-content-center align-items-center flex-grow-1">
+    <div class="text-center">
+      <h3>Aucune donnée de fiche de poste disponible</h3>
+      <p>Veuillez retourner à la liste des fiches de poste et sélectionner une fiche.</p>
+      <button class="btn btn-primary" (click)="router.navigate(['/admin/main/job-descriptions'])">
+        Retourner aux fiches de poste
+      </button>
+    </div>
+  </div>
+</ng-template>

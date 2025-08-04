@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpEvent, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../configurations/environment';
-import { JobDescriptionFile } from '../models/job-description-file.model';
 import { JobDescriptionFilePage } from '../models/job-description-file-page.model';
+import { Matching } from '../models/matching.model';
 
 @Injectable({
   providedIn: 'root'
@@ -40,5 +40,10 @@ export class JobDescriptionService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post(url, formData);
+  }
+
+  getJobDescriptionMatches(id: number): Observable<Matching[]> {
+    const url = `${environment.backendUrl}/api/job-description/matches/${id}`;
+    return this.http.get<Matching[]>(url);
   }
 }

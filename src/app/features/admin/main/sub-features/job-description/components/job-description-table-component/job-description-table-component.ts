@@ -38,8 +38,23 @@ export class JobDescriptionTableComponent {
 
   constructor(private router: Router) {}
 
-  showMatchingList(id:number) {
-    this.router.navigate(['/admin/matching', id]);
+  showMatchingList(jobDescriptionFile: JobDescriptionFile) {
+    console.log('Navigating to matching page with data:', jobDescriptionFile);
+    
+    // Store the job description data and ID in localStorage for reliable access
+    const dataToStore = {
+      jobDescriptionData: jobDescriptionFile,
+      jobDescriptionId: jobDescriptionFile.id,
+      timestamp: Date.now() // Optional: for cache expiration
+    };
+    localStorage.setItem('currentJobDescriptionData', JSON.stringify(dataToStore));
+    
+    // Navigate to matching page with correct route
+    this.router.navigate(['/admin/matching', jobDescriptionFile.id], {
+      state: { jobDescriptionData: jobDescriptionFile }
+    });
+    
+    console.log('Navigation called and data stored in localStorage with ID:', jobDescriptionFile.id);
   }
 
   goToPage(page: number) {

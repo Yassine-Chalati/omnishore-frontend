@@ -11,11 +11,11 @@
     <tbody [@fadeInPage]="currentPage">
       <tr *ngFor="let matche of paginatedMatchingList">
         <td class="text-center">{{ matche.cvFile.fileName }}</td>
-        <td class="text-center">{{ matche.score }}%</td>
+        <td class="text-center">{{ (matche.score * 100) | number:'1.1-1' }}%</td>
         <td class="text-center">
           <div class="d-flex justify-content-center align-items-center">
             <!-- <button class="btn btn-sm btn-primary custom-download-btn">Afficher fichier candidat</button> -->
-            <app-primary-button-component icon="bi bi-list-ol" label="Afficher fichier CV" (click)="onShowFilePopUpClicked()"></app-primary-button-component>
+            <app-primary-button-component icon="bi bi-list-ol" label="Afficher fichier CV" (click)="onShowFilePopUpClicked(matche.cvFile)"></app-primary-button-component>
             <!-- <button class="btn btn-sm btn-danger ms-2">Delete</button> -->
           </div>
         </td>

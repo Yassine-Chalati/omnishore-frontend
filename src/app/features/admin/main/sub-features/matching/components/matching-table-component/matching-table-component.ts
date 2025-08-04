@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, DecimalPipe } from '@angular/common';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { Matching } from '../../../../../../../core/models/matching.model';
 import { PrimaryButtonComponent } from "../../../../../../../shared/components/primary-button-component/primary-button-component";
 
 @Component({
   selector: 'app-matching-table-component',
-  imports: [NgFor, NgIf, PrimaryButtonComponent],
+  imports: [NgFor, NgIf, DecimalPipe, PrimaryButtonComponent],
   templateUrl: './matching-table-component.html',
   styleUrl: './matching-table-component.css',
   standalone: true,
@@ -34,7 +34,7 @@ export class MatchingTableComponent {
 
   @Input() matchingList: Matching[] = [];
   @Output() clickedStructuredCvForm = new EventEmitter<void>();
-  @Output() clickedFilePopUp = new EventEmitter<void>();
+  @Output() clickedFilePopUp = new EventEmitter<any>();
 
   get totalPages() {
     return Math.ceil(this.matchingList.length / this.itemsPerPage);
@@ -54,7 +54,7 @@ export class MatchingTableComponent {
     this.clickedStructuredCvForm.emit();
   }
 
-  onShowFilePopUpClicked() {
-    this.clickedFilePopUp.emit();
+  onShowFilePopUpClicked(cvFile: any) {
+    this.clickedFilePopUp.emit(cvFile);
   }
 }
