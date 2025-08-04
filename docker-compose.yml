@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  cv-frontend:
+    build: .
+    ports:
+      - "8501:4500"
+    environment:
+      - NODE_ENV=production
+      - PORT=4500
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "dist/cv_frontend/server/server.mjs", "--health-check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - cv-network
+
+networks:
+  cv-network:
+    driver: bridge
