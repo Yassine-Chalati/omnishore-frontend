@@ -3,6 +3,7 @@ import { NgIf, NgFor, NgClass } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { ToastComponent } from '../../../core/components/toast-component/toast-component';
 import { MultiStepFormComponent } from '../multi-step-form-component/multi-step-form.component';
+import { CvStructured } from '../../../core/models/cv-structured.model';
 
 @Component({
   selector: 'app-structured-cv-form-component',
@@ -35,7 +36,7 @@ export class StructuredCvFormComponent {
   @Output() closed = new EventEmitter<void>();
   modalState: 'enter' | 'leave' = 'enter';
 
-  @Input() cvStructured?: import('../../../core/models/cv-structured.model').CvStructured;
+  @Input() cvStructured?: CvStructured;
 
   @HostListener('document:keydown.escape')
   onEscapeKey() {
